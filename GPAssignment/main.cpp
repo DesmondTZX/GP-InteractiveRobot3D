@@ -10,12 +10,6 @@
 #define WINDOW_HEIGHT 800
 #define WINDOW_WIDTH 800
 
-
-void init() {
-	glMatrixMode(GL_PROJECTION);
-	// gluOrtho2D(-1.0f, 1.0f, -1.0f, 1.0f);    // Set orthogonal view for 2D
-}
-
 // Function to handle key presses
 void handleKeys(unsigned char key, int x, int y) {
 	switch (key) {
@@ -28,29 +22,48 @@ void handleKeys(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
+void handleSpecialKeys(int key, int x, int y) {
+    switch (key) {
+    case GLUT_KEY_UP:
+        break;
+    case GLUT_KEY_DOWN:
+        break;
+    case GLUT_KEY_RIGHT:
+        break;
+    case GLUT_KEY_LEFT:
+        break;
+    default:
+        break;
+    }
+    glutPostRedisplay(); // Request to update the display
+}
+
 // Display callback function
 void display() {
 	// set bg color
 	glClearColor(.0f, .0f, .0f, .0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	glMatrixMode(GL_MODELVIEW);
 
 	glFlush();                            // Render the OpenGL commands
 }
 
 int main(int argc, char** argv) {
-	glutInit(&argc, argv);                                           // Initialize GLUT
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);                     // Set display mode
-	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);                 // Set window size
-	glutCreateWindow("BACS2173 - Assignment");           // Create window with title
+    glutInit(&argc, argv);                                           // Initialize GLUT
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);        // Set display mode
+    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);                 // Set window size
+    glutCreateWindow("BACS2173 - Practical 8 (Exercise)");          // Create window with title
 
-	init();                                       // Call initialization function
+	glEnable(GL_DEPTH_TEST); // Enable depth testing
 
-	glEnable(GL_DEPTH_TEST);                      // depth test after initialization
+    glutDisplayFunc(display);
 
-	glutDisplayFunc(display);                     // Set display callback function
-	glutKeyboardFunc(handleKeys);
-	glutMainLoop();                               // Enter main event loop
+    glMatrixMode(GL_PROJECTION);
+    gluPerspective(45.0, 1.0, .1, 100.0);
 
-	return 0;
+    glutKeyboardFunc(handleKeys);
+    glutSpecialFunc(handleSpecialKeys);
+    glutMainLoop();                               // Enter main event loop
+
+    return 0;
 }
