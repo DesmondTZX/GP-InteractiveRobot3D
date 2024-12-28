@@ -24,6 +24,8 @@ GLuint innerbody;
 // Camera parameters
 bool cameraView = false;
 bool isOrtho = false;
+bool coordLines = false;
+
 float camX = 0.0f, camY = 0.0f, camZ = 5.0f; // Camera position
 float pitch = 0.0f, yaw = 0.0f;              // Camera rotation (angles in degrees)
 const float moveStep = 0.1f;                 // Movement step size
@@ -60,6 +62,10 @@ void handleKeys(unsigned char key, int x, int y) {
     
     case 8: // backspace to toggle viewport
         isOrtho = !isOrtho;
+        break;
+
+    case 32: // space key
+        coordLines = !coordLines;
         break;
 
     default:
@@ -182,6 +188,246 @@ void applyDefaultView() {
     // No rotation, looking directly at the origin (0, 0, 0)
 }
 
+void drawInnerHead() {
+    glPushMatrix();
+        glTranslatef(.0f, 1.2f, .0f);
+        glRotatef(90.0f, 1.0f, .0f, .0f);
+        glRotatef(45.0f, .0f, .0f, 1.0f);
+
+        // Draw the cylinder
+        gluCylinder(cyObj, .2, .2, .3, 4, 8);
+
+        // Draw the bottom cap
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
+            gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with bottom radius of .2
+        glPopMatrix();
+
+        // Draw the top cap
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, .3f); // Top of the cylinder
+            gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with top radius of .2
+        glPopMatrix();
+    glPopMatrix();
+}
+
+void drawOuterHeadFirstLyr() {
+    // todo: add materials and normals for texturing/coloring
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(.0f, .0f, 1.0f);
+
+        glPushMatrix();
+            glTranslatef(.0f, .8f, .0f);
+
+            glBegin(GL_QUADS);
+                // front left
+                glVertex3f(.0f, .75f, .0f);
+                glVertex3f(-.5f, .5f, .0f);
+                glVertex3f(-.5f, .0f, .0f);
+                glVertex3f(.0f, .0f, .0f);
+                
+                // front right
+                glVertex3f(.0f, .75f, .0f);
+                glVertex3f(.5f, .5f, .0f);
+                glVertex3f(.5f, .0f, .0f);
+                glVertex3f(.0f, .0f, .0f);
+                
+                // back left
+                glVertex3f(.0f, .75f, .5f);
+                glVertex3f(-.5f, .5f, .5f);
+                glVertex3f(-.5f, .0f, .5f);
+                glVertex3f(.0f, .0f, .5f);
+                
+                // back right
+                glVertex3f(.0f, .75f, .5f);
+                glVertex3f(.5f, .5f, .5f);
+                glVertex3f(.5f, .0f, .5f);
+                glVertex3f(.0f, .0f, .5f);
+
+                // left upper
+                glVertex3f(.0f, .75f, .0f);
+                glVertex3f(.0f, .75f, .5f);
+                glVertex3f(-.5f, .5f, .5f);
+                glVertex3f(-.5f, .5f, .0f);
+
+                // left lower
+                glVertex3f(-.5f, .5f, .0f);
+                glVertex3f(-.5f, .5f, .5f);
+                glVertex3f(-.5f, .0f, .5f);
+                glVertex3f(-.5f, .0f, .0f);
+
+                // right upper
+                glVertex3f(.0f, .75f, .0f);
+                glVertex3f(.0f, .75f, .5f);
+                glVertex3f(.5f, .5f, .5f);
+                glVertex3f(.5f, .5f, .0f);
+
+                // right lower
+                glVertex3f(.5f, .5f, .0f);
+                glVertex3f(.5f, .5f, .5f);
+                glVertex3f(.5f, .0f, .5f);
+                glVertex3f(.5f, .0f, .0f);
+            glEnd();
+        glPopMatrix();
+    glPopAttrib();
+}
+
+void drawEyes() {
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(1.0f, .0f, .0f);
+        glLineWidth(50.0f);
+
+        glPushMatrix();
+            glTranslatef(.0f, .6f, .0f);
+
+            glBegin(GL_LINES);
+                glVertex3f(-.2f, .5f, .51f);
+                glVertex3f(-.4f, .5f, .51f);
+                
+                glVertex3f(.2f, .5f, .51f);
+                glVertex3f(.4f, .5f, .51f);
+            glEnd();
+        glPopMatrix();
+    glPopAttrib();
+}
+
+void drawOuterHeadSecondLyr() {
+    // todo: add materials and normals for texturing/coloring
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(1.0f, .65f, .0f);
+
+        glPushMatrix();
+            glTranslatef(.0f, .6f, .0f);
+
+            glBegin(GL_QUADS);
+                // upper left cube
+                glVertex3f(.0f, 1.0f, .2f);
+                glVertex3f(.0f, 1.0f, .4f);
+                glVertex3f(-.5f, .75f, .4f);
+                glVertex3f(-.5f, .75f, .2f);
+                
+                glVertex3f(.0f, .95f, .2f);
+                glVertex3f(.0f, .95f, .4f);
+                glVertex3f(-.5f, .7f, .4f);
+                glVertex3f(-.5f, .7f, .2f);
+
+                glVertex3f(.0f, 1.0f, .4f);
+                glVertex3f(.0f, .95f, .4f);
+                glVertex3f(-.5f, .7f, .4f);
+                glVertex3f(-.5f, .75f, .4f);
+                
+                glVertex3f(.0f, 1.0f, .2f);
+                glVertex3f(.0f, .95f, .2f);
+                glVertex3f(-.5f, .7f, .2f);
+                glVertex3f(-.5f, .75f, .2f);
+
+                glVertex3f(.0f, 1.0f, .2f);
+                glVertex3f(.0f, .95f, .2f);
+                glVertex3f(.0f, .95f, .4f);
+                glVertex3f(.0f, 1.0f, .4f);
+
+                glVertex3f(-.5f, .75f, .2f);
+                glVertex3f(-.5f, .7f, .2f);
+                glVertex3f(-.5f, .7f, .4f);
+                glVertex3f(-.5f, .75f, .4f);
+
+                // lower left cube
+                glVertex3f(-.5f, .75f, .2f);
+                glVertex3f(-.5f, .2f, .2f);
+                glVertex3f(-.5f, .2f, .4f);
+                glVertex3f(-.5f, .75f, .4f);
+                
+                glVertex3f(-.55f, .75f, .2f);
+                glVertex3f(-.55f, .2f, .2f);
+                glVertex3f(-.55f, .2f, .4f);
+                glVertex3f(-.55f, .75f, .4f);
+                
+                glVertex3f(-.55f, .75f, .2f);
+                glVertex3f(-.5f, .75f, .2f);
+                glVertex3f(-.5f, .2f, .2f);
+                glVertex3f(-.55f, .2f, .2f);
+                
+                glVertex3f(-.55f, .75f, .4f);
+                glVertex3f(-.5f, .75f, .4f);
+                glVertex3f(-.5f, .2f, .4f);
+                glVertex3f(-.55f, .2f, .4f);
+                
+                glVertex3f(-.55f, .75f, .4f);
+                glVertex3f(-.5f, .75f, .4f);
+                glVertex3f(-.5f, .75f, .2f);
+                glVertex3f(-.55f, .75f, .2f);
+                
+                glVertex3f(-.55f, .2f, .4f);
+                glVertex3f(-.5f, .2f, .4f);
+                glVertex3f(-.5f, .2f, .2f);
+                glVertex3f(-.55f, .2f, .2f);
+
+                // upper right cube
+                glVertex3f(.0f, 1.0f, .2f);
+                glVertex3f(.0f, 1.0f, .4f);
+                glVertex3f(.5f, .75f, .4f);
+                glVertex3f(.5f, .75f, .2f);
+                
+                glVertex3f(.0f, .95f, .2f);
+                glVertex3f(.0f, .95f, .4f);
+                glVertex3f(.5f, .7f, .4f);
+                glVertex3f(.5f, .7f, .2f);
+
+                glVertex3f(.0f, 1.0f, .4f);
+                glVertex3f(.0f, .95f, .4f);
+                glVertex3f(.5f, .7f, .4f);
+                glVertex3f(.5f, .75f, .4f);
+                
+                glVertex3f(.0f, 1.0f, .2f);
+                glVertex3f(.0f, .95f, .2f);
+                glVertex3f(.5f, .7f, .2f);
+                glVertex3f(.5f, .75f, .2f);
+
+                glVertex3f(.0f, 1.0f, .2f);
+                glVertex3f(.0f, .95f, .2f);
+                glVertex3f(.0f, .95f, .4f);
+                glVertex3f(.0f, 1.0f, .4f);
+
+                glVertex3f(.5f, .75f, .2f);
+                glVertex3f(.5f, .7f, .2f);
+                glVertex3f(.5f, .7f, .4f);
+                glVertex3f(.5f, .75f, .4f);
+
+                // lower right cube
+                glVertex3f(.5f, .75f, .2f);
+                glVertex3f(.5f, .2f, .2f);
+                glVertex3f(.5f, .2f, .4f);
+                glVertex3f(.5f, .75f, .4f);
+                
+                glVertex3f(.55f, .75f, .2f);
+                glVertex3f(.55f, .2f, .2f);
+                glVertex3f(.55f, .2f, .4f);
+                glVertex3f(.55f, .75f, .4f);
+                
+                glVertex3f(.55f, .75f, .2f);
+                glVertex3f(.5f, .75f, .2f);
+                glVertex3f(.5f, .2f, .2f);
+                glVertex3f(.55f, .2f, .2f);
+                
+                glVertex3f(.55f, .75f, .4f);
+                glVertex3f(.5f, .75f, .4f);
+                glVertex3f(.5f, .2f, .4f);
+                glVertex3f(.55f, .2f, .4f);
+                
+                glVertex3f(.55f, .75f, .4f);
+                glVertex3f(.5f, .75f, .4f);
+                glVertex3f(.5f, .75f, .2f);
+                glVertex3f(.55f, .75f, .2f);
+                
+                glVertex3f(.55f, .2f, .4f);
+                glVertex3f(.5f, .2f, .4f);
+                glVertex3f(.5f, .2f, .2f);
+                glVertex3f(.55f, .2f, .2f);
+            glEnd();
+        glPopMatrix();
+    glPopAttrib();
+}
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -195,35 +441,41 @@ void display() {
 
     if (cameraView) {
         applyCameraTransformations(); // Use interactive camera
-        renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_TIMES_ROMAN_24, "Camera Movement: ON");
+        renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_HELVETICA_18, "Camera Movement: ON");
     } else {
         applyDefaultView(); // Use fixed default view
-        renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_TIMES_ROMAN_24, "Camera Movement: OFF");
+        renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_HELVETICA_18, "Camera Movement: OFF");
+    }
+
+    if (coordLines) {
+        renderBitmapString(-2.0f, 1.65f, GLUT_BITMAP_HELVETICA_18, "Coordinate Lines: ON");
+
+        glBegin(GL_LINES);
+            glVertex2f(-WINDOW_WIDTH, .0f);
+            glVertex2f(WINDOW_WIDTH, .0f);
+            
+            glVertex2f(.0f, -WINDOW_HEIGHT);
+            glVertex2f(.0f, WINDOW_HEIGHT);
+        glEnd();
+    } else {
+        renderBitmapString(-2.0f, 1.65f, GLUT_BITMAP_HELVETICA_18, "Coordinate Lines: OFF");
     }
 
     if (isOrtho) {
-        renderBitmapString(-2.0f, 1.6f, GLUT_BITMAP_TIMES_ROMAN_24, "Viewport: Orthogonal View");
+        renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Orthogonal View");
     } else {
-        renderBitmapString(-2.0f, 1.6f, GLUT_BITMAP_TIMES_ROMAN_24, "Viewport: Perspective View");
+        renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Perspective View");
     }
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    // enable texturing and auto assign normals for quadric objects
     // gluQuadricTexture(cyObj, GL_TRUE);
     // gluQuadricNormals(cyObj, GLU_SMOOTH);
 
+    // bind texture to object
     // glBindTexture(GL_TEXTURE_2D, innerbody);
 
-    // coordinate line, comment out when done
-    // glBegin(GL_LINES);
-    //     glVertex2f(-10.0f, .0f);
-    //     glVertex2f(10.0f, .0f);
-        
-    //     glVertex2f(.0f, -10.0f);
-    //     glVertex2f(.0f, 10.0f);
-    // glEnd();
-
-    /*
     // Inner left leg
     glPushMatrix();
         glTranslatef(-.3f, -.201f, .0f);
@@ -383,82 +635,23 @@ void display() {
 
         // inner right fingers
     glPopMatrix();
-    */
+    
+
     // Inner head
+    drawInnerHead();
+
     glPushMatrix();
-        glTranslatef(.0f, 1.2f, .0f);
-        glRotatef(90.0f, 1.0f, .0f, .0f);
-        glRotatef(45.0f, .0f, .0f, 1.0f);
+        glTranslatef(.0f, .3f, .0f);
+        glScalef(.75f, .75f, .75f);
 
-        // Draw the cylinder
-        gluCylinder(cyObj, .2, .2, .3, 4, 8);
+        // outer head 1st layer
+        drawOuterHeadFirstLyr();
 
-        // Draw the bottom cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-            gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with bottom radius of .2
-        glPopMatrix();
+        // eyes
+        drawEyes();
 
-        // Draw the top cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, .3f); // Top of the cylinder
-            gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with top radius of .2
-        glPopMatrix();
-    glPopMatrix();
-
-    // outer head 1st layer
-    glPushMatrix();
-        glTranslatef(.0f, .9f, .0f);
-
-        glBegin(GL_QUADS);
-            // front left
-            glVertex3f(.0f, .75f, .0f);
-            glVertex3f(-.5f, .5f, .0f);
-            glVertex3f(-.5f, .0f, .0f);
-            glVertex3f(.0f, .0f, .0f);
-            
-            // front right
-            glVertex3f(.0f, .75f, .0f);
-            glVertex3f(.5f, .5f, .0f);
-            glVertex3f(.5f, .0f, .0f);
-            glVertex3f(.0f, .0f, .0f);
-            
-            // back left
-            glVertex3f(.0f, .75f, .5f);
-            glVertex3f(-.5f, .5f, .5f);
-            glVertex3f(-.5f, .0f, .5f);
-            glVertex3f(.0f, .0f, .5f);
-            
-            // back right
-            glVertex3f(.0f, .75f, .5f);
-            glVertex3f(.5f, .5f, .5f);
-            glVertex3f(.5f, .0f, .5f);
-            glVertex3f(.0f, .0f, .5f);
-
-            // left upper
-            glVertex3f(.0f, .75f, .0f);
-            glVertex3f(.0f, .75f, .5f);
-            glVertex3f(-.5f, .5f, .5f);
-            glVertex3f(-.5f, .5f, .0f);
-
-            // left lower
-            glVertex3f(-.5f, .5f, .0f);
-            glVertex3f(-.5f, .5f, .5f);
-            glVertex3f(-.5f, .0f, .5f);
-            glVertex3f(-.5f, .0f, .0f);
-
-            // right upper
-            glVertex3f(.0f, .75f, .0f);
-            glVertex3f(.0f, .75f, .5f);
-            glVertex3f(.5f, .5f, .5f);
-            glVertex3f(.5f, .5f, .0f);
-
-            // right lower
-            glVertex3f(.5f, .5f, .0f);
-            glVertex3f(.5f, .5f, .5f);
-            glVertex3f(.5f, .0f, .5f);
-            glVertex3f(.5f, .0f, .0f);
-        glEnd();
+        // outer head 2nd layer
+        drawOuterHeadSecondLyr();
     glPopMatrix();
 
     glutSwapBuffers();
