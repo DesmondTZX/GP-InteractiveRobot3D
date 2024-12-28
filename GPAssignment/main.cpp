@@ -25,6 +25,7 @@ GLuint innerbody;
 bool cameraView = false;
 bool isOrtho = false;
 bool coordLines = false;
+bool drawMode = false;
 
 float camX = 0.0f, camY = 0.0f, camZ = 5.0f; // Camera position
 float pitch = 0.0f, yaw = 0.0f;              // Camera rotation (angles in degrees)
@@ -66,6 +67,10 @@ void handleKeys(unsigned char key, int x, int y) {
 
     case 32: // space key
         coordLines = !coordLines;
+        break;
+
+    case 91: // [ key
+        drawMode = !drawMode;
         break;
 
     default:
@@ -275,7 +280,6 @@ void drawOuterHeadFirstLyr() {
 void drawEyes() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .0f, .0f);
-        glLineWidth(50.0f);
 
         glPushMatrix();
             glTranslatef(.0f, .6f, .0f);
@@ -432,6 +436,8 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    glLineWidth(1.0f);
+
     // cyObj
     cyObj = gluNewQuadric();
 
@@ -467,7 +473,13 @@ void display() {
         renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Perspective View");
     }
 
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    if (drawMode) {
+        renderBitmapString(-2.0f, 1.35f, GLUT_BITMAP_HELVETICA_18, "Draw Mode: Line");
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        renderBitmapString(-2.0f, 1.35f, GLUT_BITMAP_HELVETICA_18, "Draw Mode: Fill");
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 
     // enable texturing and auto assign normals for quadric objects
     // gluQuadricTexture(cyObj, GL_TRUE);
@@ -476,6 +488,7 @@ void display() {
     // bind texture to object
     // glBindTexture(GL_TEXTURE_2D, innerbody);
 
+    
     // Inner left leg
     glPushMatrix();
         glTranslatef(-.3f, -.201f, .0f);
@@ -541,7 +554,7 @@ void display() {
             gluDisk(dkObj, 0.0, .5, 4, 1); // Disk with top radius of .5
         glPopMatrix();
     glPopMatrix();
-
+    
     // Inner chest
     glPushMatrix();
         glTranslatef(.0f, .56f, .0f);
@@ -564,6 +577,17 @@ void display() {
         glPopMatrix();
     glPopMatrix();
 
+    // outer chest front (orange)
+    glPushMatrix();
+
+    glPopMatrix();
+
+    // outer chest front (blue)
+    glPushMatrix();
+
+    glPopMatrix();
+
+    
     // whole left arm
     glPushMatrix();
         // inner lower left arm
@@ -636,24 +660,26 @@ void display() {
         // inner right fingers
     glPopMatrix();
     
-
     // Inner head
     drawInnerHead();
 
     glPushMatrix();
-        glTranslatef(.0f, .3f, .0f);
+        glTranslatef(.0f, .29f, .0f);
         glScalef(.75f, .75f, .75f);
 
         // outer head 1st layer
         drawOuterHeadFirstLyr();
 
         // eyes
+        glLineWidth(10.0f);
         drawEyes();
+
+        glLineWidth(1.0f);
 
         // outer head 2nd layer
         drawOuterHeadSecondLyr();
     glPopMatrix();
-
+    
     glutSwapBuffers();
 }
 
