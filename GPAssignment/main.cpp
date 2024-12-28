@@ -207,8 +207,7 @@ void display() {
         renderBitmapString(-2.0f, 1.6f, GLUT_BITMAP_TIMES_ROMAN_24, "Viewport: Perspective View");
     }
 
-    gluQuadricDrawStyle(cyObj, GLU_LINE);
-    gluQuadricDrawStyle(dkObj, GLU_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // gluQuadricTexture(cyObj, GL_TRUE);
     // gluQuadricNormals(cyObj, GLU_SMOOTH);
@@ -224,6 +223,7 @@ void display() {
     //     glVertex2f(.0f, 10.0f);
     // glEnd();
 
+    /*
     // Inner left leg
     glPushMatrix();
         glTranslatef(-.3f, -.201f, .0f);
@@ -383,7 +383,7 @@ void display() {
 
         // inner right fingers
     glPopMatrix();
-
+    */
     // Inner head
     glPushMatrix();
         glTranslatef(.0f, 1.2f, .0f);
@@ -404,6 +404,61 @@ void display() {
             glTranslatef(0.0f, 0.0f, .3f); // Top of the cylinder
             gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with top radius of .2
         glPopMatrix();
+    glPopMatrix();
+
+    // outer head 1st layer
+    glPushMatrix();
+        glTranslatef(.0f, .9f, .0f);
+
+        glBegin(GL_QUADS);
+            // front left
+            glVertex3f(.0f, .75f, .0f);
+            glVertex3f(-.5f, .5f, .0f);
+            glVertex3f(-.5f, .0f, .0f);
+            glVertex3f(.0f, .0f, .0f);
+            
+            // front right
+            glVertex3f(.0f, .75f, .0f);
+            glVertex3f(.5f, .5f, .0f);
+            glVertex3f(.5f, .0f, .0f);
+            glVertex3f(.0f, .0f, .0f);
+            
+            // back left
+            glVertex3f(.0f, .75f, .5f);
+            glVertex3f(-.5f, .5f, .5f);
+            glVertex3f(-.5f, .0f, .5f);
+            glVertex3f(.0f, .0f, .5f);
+            
+            // back right
+            glVertex3f(.0f, .75f, .5f);
+            glVertex3f(.5f, .5f, .5f);
+            glVertex3f(.5f, .0f, .5f);
+            glVertex3f(.0f, .0f, .5f);
+
+            // left upper
+            glVertex3f(.0f, .75f, .0f);
+            glVertex3f(.0f, .75f, .5f);
+            glVertex3f(-.5f, .5f, .5f);
+            glVertex3f(-.5f, .5f, .0f);
+
+            // left lower
+            glVertex3f(-.5f, .5f, .0f);
+            glVertex3f(-.5f, .5f, .5f);
+            glVertex3f(-.5f, .0f, .5f);
+            glVertex3f(-.5f, .0f, .0f);
+
+            // right upper
+            glVertex3f(.0f, .75f, .0f);
+            glVertex3f(.0f, .75f, .5f);
+            glVertex3f(.5f, .5f, .5f);
+            glVertex3f(.5f, .5f, .0f);
+
+            // right lower
+            glVertex3f(.5f, .5f, .0f);
+            glVertex3f(.5f, .5f, .5f);
+            glVertex3f(.5f, .0f, .5f);
+            glVertex3f(.5f, .0f, .0f);
+        glEnd();
     glPopMatrix();
 
     glutSwapBuffers();

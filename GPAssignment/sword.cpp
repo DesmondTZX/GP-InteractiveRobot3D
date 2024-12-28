@@ -19,8 +19,8 @@ void drawSword2D() {
     glColor3f(0.5f, 0.5f, 0.5f); // Silver color
     glVertex3f(-0.025f, -1.0f, 0.0f); // Bottom left (narrower handle)
     glVertex3f(0.025f, -1.0f, 0.0f);  // Bottom right (narrower handle)
-    glVertex3f(0.025f, -0.8f, 0.0f);  // Top right
-    glVertex3f(-0.025f, -0.8f, 0.0f); // Top left
+    glVertex3f(0.025f, -0.5f, 0.0f);  // Top right
+    glVertex3f(-0.025f, -0.5f, 0.0f); // Top left
     glEnd();
 
     // Crossguard
@@ -92,10 +92,10 @@ void drawSword3D() {
     glVertex3f(0.025f, -1.0f, depthStep * steps / 2.0f);
     glVertex3f(-0.025f, -1.0f, depthStep * steps / 2.0f);
 
-    glVertex3f(-0.025f, -0.8f, -depthStep * steps / 2.0f);
-    glVertex3f(0.025f, -0.8f, -depthStep * steps / 2.0f);
-    glVertex3f(0.025f, -0.8f, depthStep * steps / 2.0f);
-    glVertex3f(-0.025f, -0.8f, depthStep * steps / 2.0f);
+    glVertex3f(-0.025f, -0.5f, -depthStep * steps / 2.0f);
+    glVertex3f(0.025f, -0.5f, -depthStep * steps / 2.0f);
+    glVertex3f(0.025f, -0.5f, depthStep * steps / 2.0f);
+    glVertex3f(-0.025f, -0.5f, depthStep * steps / 2.0f);
     glEnd();
 
     glPopMatrix();
