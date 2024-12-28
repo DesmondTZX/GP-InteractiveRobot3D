@@ -81,6 +81,13 @@ void handleKeys(unsigned char key, int x, int y) {
             case 's': camY -= moveStep; break; // Move camera down
             case 'a': camX -= moveStep; break; // Move camera left
             case 'd': camX += moveStep; break; // Move camera right
+
+            case 45: // minus key (not on numpad)
+                camZ += moveStep;
+                break;
+            case 61: // equal key
+                camZ -= moveStep;
+                break;
             default: break;
             }
         }
@@ -432,6 +439,59 @@ void drawOuterHeadSecondLyr() {
     glPopAttrib();
 }
 
+void drawInnerChest() {
+    glPushMatrix();
+        glTranslatef(.0f, .56f, .0f);
+        glRotatef(-90.0f, 1.0f, .0f, .0f);
+        glRotatef(90.0f, .0f, .0f, 1.0f);
+
+        // Draw the cylinder
+        gluCylinder(cyObj, .55, .85, .35, 6, 8);
+
+        // Draw the bottom cap
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
+            gluDisk(dkObj, 0.0, .55, 6, 1); // Disk with bottom radius of .55
+        glPopMatrix();
+
+        // Draw the top cap
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, .35f); // Top of the cylinder
+            gluDisk(dkObj, 0.0, .85, 6, 1); // Disk with top radius of .85
+        glPopMatrix();
+    glPopMatrix();
+}
+
+void drawOuterChest() {
+    // outer chest front (orange)
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(1.0f, .65f, .0f);
+    
+        glPushMatrix();
+            glTranslatef(.0f, .7f, .0f);
+            glRotatef(-90.0f, 1.0f, .0f, .0f);
+            glRotatef(90.0f, .0f, .0f, 1.0f);
+
+            // Draw the cylinder
+            gluCylinder(cyObj, .65, .95, .2, 6, 8);
+        glPopMatrix();
+    glPopAttrib();
+
+    // outer chest front (blue)
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(.0f, .0f, 1.0f);
+
+        glPushMatrix();
+            glTranslatef(.0f, .6f, .0f);
+            glRotatef(-90.0f, 1.0f, .0f, .0f);
+            glRotatef(90.0f, .0f, .0f, 1.0f);
+
+            // Draw the cylinder
+            gluCylinder(cyObj, .65, .75, .15, 6, 8);
+        glPopMatrix();
+    glPopAttrib();
+}
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -556,36 +616,10 @@ void display() {
     glPopMatrix();
     
     // Inner chest
-    glPushMatrix();
-        glTranslatef(.0f, .56f, .0f);
-        glRotatef(-90.0f, 1.0f, .0f, .0f);
-        glRotatef(90.0f, .0f, .0f, 1.0f);
+    drawInnerChest();
 
-        // Draw the cylinder
-        gluCylinder(cyObj, .55, .85, .35, 6, 8);
-
-        // Draw the bottom cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-            gluDisk(dkObj, 0.0, .55, 6, 1); // Disk with bottom radius of .55
-        glPopMatrix();
-
-        // Draw the top cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, .35f); // Top of the cylinder
-            gluDisk(dkObj, 0.0, .85, 6, 1); // Disk with top radius of .85
-        glPopMatrix();
-    glPopMatrix();
-
-    // outer chest front (orange)
-    glPushMatrix();
-
-    glPopMatrix();
-
-    // outer chest front (blue)
-    glPushMatrix();
-
-    glPopMatrix();
+    // outer chest
+    drawOuterChest();
 
     
     // whole left arm
@@ -664,7 +698,7 @@ void display() {
     drawInnerHead();
 
     glPushMatrix();
-        glTranslatef(.0f, .29f, .0f);
+        glTranslatef(.0f, .29f, -.2f);
         glScalef(.75f, .75f, .75f);
 
         // outer head 1st layer
