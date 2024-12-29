@@ -20,7 +20,10 @@ GLUquadricObj* spObj = NULL;
 GLUquadricObj* dkObj = NULL;
 
 GLuint innerbody;
-GLuint textureArr[3];
+GLuint pistolHandle;
+GLuint pistolBody;
+GLuint bulletTex;
+// GLuint textureArr[4];
 
 // Camera parameters
 bool cameraView = false;
@@ -82,11 +85,13 @@ void handleKeys(unsigned char key, int x, int y) {
         exit(0);
 
     case 9: // Tab key to toggle the camera view
+        std::cout << "Before toggle: " << cameraView << std::endl;
         cameraView = !cameraView;
+        std::cout << "After toggle: " << cameraView << std::endl;
+
         if (cameraView) {
-            std::cout << "Camera view is ON.\n";
+            std::cout << "Camera view is ON." << std::endl;
         } else {
-            // Reset camera transformations when toggling off
             camX = 0.0f;
             camY = 0.0f;
             camZ = 8.0f;
@@ -94,7 +99,7 @@ void handleKeys(unsigned char key, int x, int y) {
             yaw = 0.0f;
             lastMouseX = -1; // Reset mouse tracking
             lastMouseY = -1;
-            std::cout << "Camera view is OFF. Camera reset to default.\n";
+            std::cout << "Camera view is OFF. Camera reset to default." << std::endl;
         }
         break;
     
@@ -231,6 +236,7 @@ void handleKeys(unsigned char key, int x, int y) {
             default: break;
             }
 		}
+        break;
     }
 
     glutPostRedisplay(); // Request a redraw of the scene
@@ -1020,11 +1026,11 @@ void pistol() {
 
     //pistol body
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
+    glBindTexture(GL_TEXTURE_2D, pistolBody);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glColor3f(0.83, 0.83, 0.83);
     pistolCube(0.35, 0.1, 0.1);
-    glDeleteTextures(1, &textureArr[1]);
+    // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
 
     glPushMatrix();
@@ -1034,13 +1040,13 @@ void pistol() {
 
     //pistol handle
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[2]);
+    glBindTexture(GL_TEXTURE_2D, pistolHandle);
     // textureArr[1] = loadTexture2("brownleather.bmp");
     glTranslatef(0.05, 0.01, 0.05);
     glRotatef(110, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
     pistolCube(0.2, 0.08, 0.08);
-    glDeleteTextures(1, &textureArr[2]);
+    // glDeleteTextures(1, &pistolHandle);
     glPopMatrix();
 
     glPushMatrix();
@@ -1052,13 +1058,13 @@ void pistol() {
 
     //pistol scope
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
+    glBindTexture(GL_TEXTURE_2D, pistolBody);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glTranslatef(0.3, 0.04, 0.01);
     glRotatef(270, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.03, 0.03);
-    glDeleteTextures(1, &textureArr[1]);
+    // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
 
     glPushMatrix();
@@ -1077,13 +1083,13 @@ void pistol() {
 
     //pistol press space straight
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
+    glBindTexture(GL_TEXTURE_2D, pistolBody);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glTranslatef(0.2, 0.03, -0.05);
     glRotatef(270, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.04, 0.02);
-    glDeleteTextures(1, &textureArr[1]);
+    // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
 
     glPushMatrix();
@@ -1095,13 +1101,13 @@ void pistol() {
 
     //pistol press space horizontal
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
+    glBindTexture(GL_TEXTURE_2D, pistolBody);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glTranslatef(0.2, 0.03, -0.05);
     glRotatef(180, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.04, 0.02);
-    glDeleteTextures(1, &textureArr[1]);
+    // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
 
     glPushMatrix();
@@ -1113,13 +1119,13 @@ void pistol() {
 
     //pistol shooting button
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
+    glBindTexture(GL_TEXTURE_2D, pistolBody);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glTranslatef(0.16, 0.043, -0.025);
     glRotatef(230, 0.0, 1.0, 0.0);
     glColor3f(0.85, 0.85, 0.85);
     pistolCube(0.08, 0.02, 0.02);
-    glDeleteTextures(1, &textureArr[1]);
+    // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
     
     glPushMatrix();
@@ -1144,11 +1150,11 @@ void bulletShoot() {
     glPushMatrix();
     // GLuint textureArr[1];
     // textureArr[0] = loadTexture2("bullet.bmp");
-    glBindTexture(GL_TEXTURE_2D, textureArr[3]);
+    glBindTexture(GL_TEXTURE_2D, bulletTex);
     glTranslatef(0.3, 0.05, 0.05);
     glColor3f(1.0, 1.0, 1.0);
     bullet();
-    glDeleteTextures(1, &textureArr[0]);
+    // glDeleteTextures(1, &bulletTex);
     glPopMatrix();
     
 }
@@ -1473,9 +1479,9 @@ int main(int argc, char** argv) {
 
     innerbody = loadTexture("inner_body.bmp");
 
-    textureArr[1] = loadTexture("pistolsilver.bmp");
-    textureArr[2] = loadTexture("brownleather.bmp");
-    textureArr[3] = loadTexture("bullet.bmp");
+    pistolBody = loadTexture("pistolsilver.bmp");
+    pistolHandle = loadTexture("brownleather.bmp");
+    bulletTex = loadTexture("bullet.bmp");
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
