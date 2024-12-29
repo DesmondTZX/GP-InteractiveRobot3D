@@ -18,6 +18,9 @@ GLUquadricObj* spObj = NULL;
 GLUquadricObj* dkObj = NULL;
 
 GLuint innerbody;
+GLuint outerbody1;
+GLuint outerbody2;
+
 GLuint pistolHandle;
 GLuint pistolBody;
 GLuint bulletTex;
@@ -27,7 +30,7 @@ GLuint bulletTex;
 bool cameraView = false;
 bool isOrtho = false;
 bool coordLines = false;
-bool drawMode = true;
+bool drawMode = false;
 bool textureView = false;
 
 float camX = 0.0f, camY = 0.0f, camZ = 8.0f; // Camera position
@@ -370,31 +373,30 @@ void applyDefaultView() {
     // No rotation, looking directly at the origin (0, 0, 0)
 }
 
-void drawInnerHead() {
-    glPushMatrix();
-        glTranslatef(.0f, 1.2f, .0f);
-        glRotatef(90.0f, 1.0f, .0f, .0f);
-        glRotatef(45.0f, .0f, .0f, 1.0f);
+// void drawInnerHead() {
+//     glPushMatrix();
+//         glTranslatef(.0f, 1.2f, .0f);
+//         glRotatef(90.0f, 1.0f, .0f, .0f);
+//         glRotatef(45.0f, .0f, .0f, 1.0f);
 
-        // Draw the cylinder
-        gluCylinder(cyObj, .2, .2, .3, 4, 8);
+//         // Draw the cylinder
+//         gluCylinder(cyObj, .2, .2, .3, 4, 8);
 
-        // Draw the bottom cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-            gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with bottom radius of .2
-        glPopMatrix();
+//         // Draw the bottom cap
+//         glPushMatrix();
+//             glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
+//             gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with bottom radius of .2
+//         glPopMatrix();
 
-        // Draw the top cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, .3f); // Top of the cylinder
-            gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with top radius of .2
-        glPopMatrix();
-    glPopMatrix();
-}
+//         // Draw the top cap
+//         glPushMatrix();
+//             glTranslatef(0.0f, 0.0f, .3f); // Top of the cylinder
+//             gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with top radius of .2
+//         glPopMatrix();
+//     glPopMatrix();
+// }
 
 void drawOuterHeadFirstLyr() {
-    // todo: add materials and normals for texturing/coloring
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
 
@@ -403,52 +405,52 @@ void drawOuterHeadFirstLyr() {
 
             glBegin(GL_QUADS);
                 // front left
-                glVertex3f(.0f, .75f, .0f);
-                glVertex3f(-.5f, .5f, .0f);
-                glVertex3f(-.5f, .0f, .0f);
-                glVertex3f(.0f, .0f, .0f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .0f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .0f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-.5f, .0f, .0f);
+                glTexCoord2f(0.5f, 0.0f); glVertex3f(.0f, .0f, .0f);
                 
                 // front right
-                glVertex3f(.0f, .75f, .0f);
-                glVertex3f(.5f, .5f, .0f);
-                glVertex3f(.5f, .0f, .0f);
-                glVertex3f(.0f, .0f, .0f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .0f);
+                glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .0f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(.5f, .0f, .0f);
+                glTexCoord2f(0.5f, 0.0f); glVertex3f(.0f, .0f, .0f);
                 
                 // back left
-                glVertex3f(.0f, .75f, .5f);
-                glVertex3f(-.5f, .5f, .5f);
-                glVertex3f(-.5f, .0f, .5f);
-                glVertex3f(.0f, .0f, .5f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .5f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .5f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-.5f, .0f, .5f);
+                glTexCoord2f(0.5f, 0.0f); glVertex3f(.0f, .0f, .5f);
                 
                 // back right
-                glVertex3f(.0f, .75f, .5f);
-                glVertex3f(.5f, .5f, .5f);
-                glVertex3f(.5f, .0f, .5f);
-                glVertex3f(.0f, .0f, .5f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .5f);
+                glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .5f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(.5f, .0f, .5f);
+                glTexCoord2f(0.5f, 0.0f); glVertex3f(.0f, .0f, .5f);
 
                 // left upper
-                glVertex3f(.0f, .75f, .0f);
-                glVertex3f(.0f, .75f, .5f);
-                glVertex3f(-.5f, .5f, .5f);
-                glVertex3f(-.5f, .5f, .0f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .0f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .5f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .5f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .0f);
 
                 // left lower
-                glVertex3f(-.5f, .5f, .0f);
-                glVertex3f(-.5f, .5f, .5f);
-                glVertex3f(-.5f, .0f, .5f);
-                glVertex3f(-.5f, .0f, .0f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .0f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .5f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-.5f, .0f, .5f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-.5f, .0f, .0f);
 
                 // right upper
-                glVertex3f(.0f, .75f, .0f);
-                glVertex3f(.0f, .75f, .5f);
-                glVertex3f(.5f, .5f, .5f);
-                glVertex3f(.5f, .5f, .0f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .0f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .5f);
+                glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .5f);
+                glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .0f);
 
                 // right lower
-                glVertex3f(.5f, .5f, .0f);
-                glVertex3f(.5f, .5f, .5f);
-                glVertex3f(.5f, .0f, .5f);
-                glVertex3f(.5f, .0f, .0f);
+                glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .0f);
+                glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .5f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(.5f, .0f, .5f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(.5f, .0f, .0f);
             glEnd();
         glPopMatrix();
     glPopAttrib();
@@ -481,155 +483,283 @@ void drawOuterHeadSecondLyr() {
             glTranslatef(.0f, .6f, .0f);
 
             glBegin(GL_QUADS);
-                // upper left cube
-                glVertex3f(.0f, 1.0f, .2f);
-                glVertex3f(.0f, 1.0f, .4f);
-                glVertex3f(-.5f, .75f, .4f);
-                glVertex3f(-.5f, .75f, .2f);
-                
-                glVertex3f(.0f, .95f, .2f);
-                glVertex3f(.0f, .95f, .4f);
-                glVertex3f(-.5f, .7f, .4f);
-                glVertex3f(-.5f, .7f, .2f);
+                // Upper left cube
 
-                glVertex3f(.0f, 1.0f, .4f);
-                glVertex3f(.0f, .95f, .4f);
-                glVertex3f(-.5f, .7f, .4f);
-                glVertex3f(-.5f, .75f, .4f);
-                
-                glVertex3f(.0f, 1.0f, .2f);
-                glVertex3f(.0f, .95f, .2f);
-                glVertex3f(-.5f, .7f, .2f);
-                glVertex3f(-.5f, .75f, .2f);
+                // First face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(0.0f, 0.5f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                glVertex3f(0.0f, 1.0f, 0.4f);
+                glTexCoord2f(0.5f, 0.5f);  // texCoord for (-0.5f, 0.75f, 0.4f)
+                glVertex3f(-0.5f, 0.75f, 0.4f);
+                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
+                glVertex3f(-0.5f, 0.75f, 0.2f);
 
-                glVertex3f(.0f, 1.0f, .2f);
-                glVertex3f(.0f, .95f, .2f);
-                glVertex3f(.0f, .95f, .4f);
-                glVertex3f(.0f, 1.0f, .4f);
+                // Second face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(0.0f, 0.5f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(0.5f, 0.5f);  // texCoord for (-0.5f, 0.7f, 0.4f)
+                glVertex3f(-0.5f, 0.7f, 0.4f);
+                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.7f, 0.2f)
+                glVertex3f(-0.5f, 0.7f, 0.2f);
 
-                glVertex3f(-.5f, .75f, .2f);
-                glVertex3f(-.5f, .7f, .2f);
-                glVertex3f(-.5f, .7f, .4f);
-                glVertex3f(-.5f, .75f, .4f);
+                // Third face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                glVertex3f(0.0f, 1.0f, 0.4f);
+                glTexCoord2f(0.0f, 0.5f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(0.5f, 0.5f);  // texCoord for (-0.5f, 0.7f, 0.4f)
+                glVertex3f(-0.5f, 0.7f, 0.4f);
+                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
+                glVertex3f(-0.5f, 0.75f, 0.4f);
 
-                // lower left cube
-                glVertex3f(-.5f, .75f, .2f);
-                glVertex3f(-.5f, .2f, .2f);
-                glVertex3f(-.5f, .2f, .4f);
-                glVertex3f(-.5f, .75f, .4f);
-                
-                glVertex3f(-.55f, .75f, .2f);
-                glVertex3f(-.55f, .2f, .2f);
-                glVertex3f(-.55f, .2f, .4f);
-                glVertex3f(-.55f, .75f, .4f);
-                
-                glVertex3f(-.55f, .75f, .2f);
-                glVertex3f(-.5f, .75f, .2f);
-                glVertex3f(-.5f, .2f, .2f);
-                glVertex3f(-.55f, .2f, .2f);
-                
-                glVertex3f(-.55f, .75f, .4f);
-                glVertex3f(-.5f, .75f, .4f);
-                glVertex3f(-.5f, .2f, .4f);
-                glVertex3f(-.55f, .2f, .4f);
-                
-                glVertex3f(-.55f, .75f, .4f);
-                glVertex3f(-.5f, .75f, .4f);
-                glVertex3f(-.5f, .75f, .2f);
-                glVertex3f(-.55f, .75f, .2f);
-                
-                glVertex3f(-.55f, .2f, .4f);
-                glVertex3f(-.5f, .2f, .4f);
-                glVertex3f(-.5f, .2f, .2f);
-                glVertex3f(-.55f, .2f, .2f);
+                // Fourth face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(0.0f, 0.5f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(0.5f, 0.5f);  // texCoord for (-0.5f, 0.7f, 0.2f)
+                glVertex3f(-0.5f, 0.7f, 0.2f);
+                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
+                glVertex3f(-0.5f, 0.75f, 0.2f);
 
-                // upper right cube
-                glVertex3f(.0f, 1.0f, .2f);
-                glVertex3f(.0f, 1.0f, .4f);
-                glVertex3f(.5f, .75f, .4f);
-                glVertex3f(.5f, .75f, .2f);
-                
-                glVertex3f(.0f, .95f, .2f);
-                glVertex3f(.0f, .95f, .4f);
-                glVertex3f(.5f, .7f, .4f);
-                glVertex3f(.5f, .7f, .2f);
+                // Fifth face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                glVertex3f(0.0f, 1.0f, 0.4f);
 
-                glVertex3f(.0f, 1.0f, .4f);
-                glVertex3f(.0f, .95f, .4f);
-                glVertex3f(.5f, .7f, .4f);
-                glVertex3f(.5f, .75f, .4f);
-                
-                glVertex3f(.0f, 1.0f, .2f);
-                glVertex3f(.0f, .95f, .2f);
-                glVertex3f(.5f, .7f, .2f);
-                glVertex3f(.5f, .75f, .2f);
+                // Sixth face
+                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
+                glVertex3f(-0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.5f, 0.0f);  // texCoord for (-0.5f, 0.7f, 0.2f)
+                glVertex3f(-0.5f, 0.7f, 0.2f);
+                glTexCoord2f(0.5f, 0.0f);  // texCoord for (-0.5f, 0.7f, 0.4f)
+                glVertex3f(-0.5f, 0.7f, 0.4f);
+                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
+                glVertex3f(-0.5f, 0.75f, 0.4f);
 
-                glVertex3f(.0f, 1.0f, .2f);
-                glVertex3f(.0f, .95f, .2f);
-                glVertex3f(.0f, .95f, .4f);
-                glVertex3f(.0f, 1.0f, .4f);
+                // Lower left cube
 
-                glVertex3f(.5f, .75f, .2f);
-                glVertex3f(.5f, .7f, .2f);
-                glVertex3f(.5f, .7f, .4f);
-                glVertex3f(.5f, .75f, .4f);
+                // First face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
+                glVertex3f(-0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.2f)
+                glVertex3f(-0.5f, 0.2f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.4f)
+                glVertex3f(-0.5f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
+                glVertex3f(-0.5f, 0.75f, 0.4f);
 
-                // lower right cube
-                glVertex3f(.5f, .75f, .2f);
-                glVertex3f(.5f, .2f, .2f);
-                glVertex3f(.5f, .2f, .4f);
-                glVertex3f(.5f, .75f, .4f);
-                
-                glVertex3f(.55f, .75f, .2f);
-                glVertex3f(.55f, .2f, .2f);
-                glVertex3f(.55f, .2f, .4f);
-                glVertex3f(.55f, .75f, .4f);
-                
-                glVertex3f(.55f, .75f, .2f);
-                glVertex3f(.5f, .75f, .2f);
-                glVertex3f(.5f, .2f, .2f);
-                glVertex3f(.55f, .2f, .2f);
-                
-                glVertex3f(.55f, .75f, .4f);
-                glVertex3f(.5f, .75f, .4f);
-                glVertex3f(.5f, .2f, .4f);
-                glVertex3f(.55f, .2f, .4f);
-                
-                glVertex3f(.55f, .75f, .4f);
-                glVertex3f(.5f, .75f, .4f);
-                glVertex3f(.5f, .75f, .2f);
-                glVertex3f(.55f, .75f, .2f);
-                
-                glVertex3f(.55f, .2f, .4f);
-                glVertex3f(.5f, .2f, .4f);
-                glVertex3f(.5f, .2f, .2f);
-                glVertex3f(.55f, .2f, .2f);
+                // Second face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.2f)
+                glVertex3f(-0.55f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.2f)
+                glVertex3f(-0.55f, 0.2f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.4f)
+                glVertex3f(-0.55f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.4f)
+                glVertex3f(-0.55f, 0.75f, 0.4f);
+
+                // Third face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.2f)
+                glVertex3f(-0.55f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
+                glVertex3f(-0.5f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.2f)
+                glVertex3f(-0.5f, 0.2f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.2f)
+                glVertex3f(-0.55f, 0.2f, 0.2f);
+
+                // Fourth face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.4f)
+                glVertex3f(-0.55f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
+                glVertex3f(-0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.4f)
+                glVertex3f(-0.5f, 0.2f, 0.4f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.4f)
+                glVertex3f(-0.55f, 0.2f, 0.4f);
+
+                // Fifth face (top face)
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.4f)
+                glVertex3f(-0.55f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
+                glVertex3f(-0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
+                glVertex3f(-0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.75f, 0.2f)
+                glVertex3f(-0.55f, 0.75f, 0.2f);
+
+                // Sixth face (bottom face)
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.2f, 0.4f)
+                glVertex3f(-0.55f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.2f, 0.4f)
+                glVertex3f(-0.5f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.2f)
+                glVertex3f(-0.5f, 0.2f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.2f)
+                glVertex3f(-0.55f, 0.2f, 0.2f);
+
+                // Upper right cube
+
+                // First face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                glVertex3f(0.0f, 1.0f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glVertex3f(0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                glVertex3f(0.5f, 0.75f, 0.2f);
+
+                // Second face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.7f, 0.4f)
+                glVertex3f(0.5f, 0.7f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.7f, 0.2f)
+                glVertex3f(0.5f, 0.7f, 0.2f);
+
+                // Third face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                glVertex3f(0.0f, 1.0f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.7f, 0.4f)
+                glVertex3f(0.5f, 0.7f, 0.4f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glVertex3f(0.5f, 0.75f, 0.4f);
+
+                // Fourth face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.7f, 0.2f)
+                glVertex3f(0.5f, 0.7f, 0.2f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                glVertex3f(0.5f, 0.75f, 0.2f);
+
+                // Fifth face (top face)
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                glVertex3f(0.0f, 1.0f, 0.4f);
+
+                // Sixth face (bottom face)
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                glVertex3f(0.5f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.7f, 0.2f)
+                glVertex3f(0.5f, 0.7f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.7f, 0.4f)
+                glVertex3f(0.5f, 0.7f, 0.4f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glVertex3f(0.5f, 0.75f, 0.4f);
+
+                // Lower right cube
+
+                // First face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                glVertex3f(0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.2f)
+                glVertex3f(0.5f, 0.2f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.4f)
+                glVertex3f(0.5f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glVertex3f(0.5f, 0.75f, 0.4f);
+
+                // Second face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.2f)
+                glVertex3f(0.55f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.2f)
+                glVertex3f(0.55f, 0.2f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.4f)
+                glVertex3f(0.55f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.4f)
+                glVertex3f(0.55f, 0.75f, 0.4f);
+
+                // Third face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.2f)
+                glVertex3f(0.55f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                glVertex3f(0.5f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.2f)
+                glVertex3f(0.5f, 0.2f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.2f)
+                glVertex3f(0.55f, 0.2f, 0.2f);
+
+                // Fourth face
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.4f)
+                glVertex3f(0.55f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glVertex3f(0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.4f)
+                glVertex3f(0.5f, 0.2f, 0.4f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.4f)
+                glVertex3f(0.55f, 0.2f, 0.4f);
+
+                // Fifth face (top face)
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.4f)
+                glVertex3f(0.55f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glVertex3f(0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                glVertex3f(0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.75f, 0.2f)
+                glVertex3f(0.55f, 0.75f, 0.2f);
+
+                // Sixth face (bottom face)
+                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.2f, 0.4f)
+                glVertex3f(0.55f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.2f, 0.4f)
+                glVertex3f(0.5f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.2f)
+                glVertex3f(0.5f, 0.2f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.2f)
+                glVertex3f(0.55f, 0.2f, 0.2f);
             glEnd();
         glPopMatrix();
     glPopAttrib();
 }
 
 void drawInnerChest() {
-    glPushMatrix();
-        glTranslatef(.0f, .56f, .0f);
-        glRotatef(-90.0f, 1.0f, .0f, .0f);
-        glRotatef(90.0f, .0f, .0f, 1.0f);
-
-        // Draw the cylinder
-        gluCylinder(cyObj, .55, .85, .35, 6, 8);
-
-        // Draw the bottom cap
+    glPushAttrib(GL_CURRENT_BIT);
         glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-            gluDisk(dkObj, 0.0, .55, 6, 1); // Disk with bottom radius of .55
-        glPopMatrix();
+            glColor3f(.18f, .24f, .29f);
 
-        // Draw the top cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, .35f); // Top of the cylinder
-            gluDisk(dkObj, 0.0, .85, 6, 1); // Disk with top radius of .85
+            glTranslatef(.0f, .56f, .0f);
+            glRotatef(-90.0f, 1.0f, .0f, .0f);
+            glRotatef(90.0f, .0f, .0f, 1.0f);
+
+            // Draw the cylinder
+            gluCylinder(cyObj, .55, .85, .35, 6, 8);
+
+            // Draw the bottom cap
+            glPushMatrix();
+                glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
+                gluDisk(dkObj, 0.0, .55, 6, 1); // Disk with bottom radius of .55
+            glPopMatrix();
+
+            // Draw the top cap
+            glPushMatrix();
+                glTranslatef(0.0f, 0.0f, .35f); // Top of the cylinder
+                gluDisk(dkObj, 0.0, .85, 6, 1); // Disk with top radius of .85
+            glPopMatrix();
         glPopMatrix();
-    glPopMatrix();
+    glPopAttrib();
 }
 
 void drawOuterChest() {
@@ -709,7 +839,12 @@ void drawLeftArm() {
     glRotatef(leftWholeArmRotateX, 1.0f, 0.0f, 0.0f); // TODO: Rotate the hand like walking and running animation
     glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
 
-    gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(1.0f, .65f, .0f);
+
+        gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
+    glPopAttrib();
+
     glPushMatrix();
         glTranslatef(0.0f, 0.0f, 0.4f);     
         glRotatef(-45.0f, 0.0f, 0.0f, 1.0f);  // Counter-rotate
@@ -717,12 +852,21 @@ void drawLeftArm() {
         glRotatef(lowerArmRotateY, 0.0f, 1.0f, 0.0f);   
         glRotatef(45.0f, 0.0f, 0.0f, 1.0f);   // Restore rotation
 
-        gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
+        glPushAttrib(GL_CURRENT_BIT);
+            glColor3f(1.0f, .65f, .0f);
+
+            gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
+        glPopAttrib();
 
         // Palm
         glPushMatrix();
             glTranslatef(0.0f, 0.0f, 0.6f);
-            gluCylinder(cyObj, 0.2, 0.2, 0.2, 4, 8);
+            
+            glPushAttrib(GL_CURRENT_BIT);
+                glColor3f(1.0f, .65f, .0f);
+
+                gluCylinder(cyObj, 0.2, 0.2, 0.2, 4, 8);
+            glPopAttrib();
 
             // Finger group
             glPushMatrix();
@@ -730,40 +874,60 @@ void drawLeftArm() {
                 glTranslatef(0.0f, 0.0f, 0.15f);
     
                 // Thumb
-                glPushMatrix();
-                    glScalef(0.8f, 0.8f, 0.8f);
-                    glTranslatef(0.15f, 0.1f, -0.2f);
-                    glRotatef(30.0f, 0.0f, 1.0f, 0.0f);  // Tilt the thumb
-                    drawFinger(baseAngle, middleAngle, tipAngle);
-                glPopMatrix();
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
+
+                    glPushMatrix();
+                        glScalef(0.8f, 0.8f, 0.8f);
+                        glTranslatef(0.15f, 0.1f, -0.2f);
+                        glRotatef(30.0f, 0.0f, 1.0f, 0.0f);  // Tilt the thumb
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
 
                 // Index finger
-                glPushMatrix();
-                    glScalef(0.7f, 0.7f, 0.7f);
-                    glTranslatef(-0.1f, 0.1f, 0.0f);
-                    drawFinger(baseAngle, middleAngle, tipAngle);
-                glPopMatrix();
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
+
+                    glPushMatrix();
+                        glScalef(0.7f, 0.7f, 0.7f);
+                        glTranslatef(-0.1f, 0.1f, 0.0f);
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
 
                 // Middle finger
-                glPushMatrix();
-                    glScalef(0.7f, 0.7f, 0.7f);
-                    glTranslatef(0.0f, 0.1f, 0.0f);
-                    drawFinger(baseAngle, middleAngle, tipAngle);
-                glPopMatrix();
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
+
+                    glPushMatrix();
+                        glScalef(0.7f, 0.7f, 0.7f);
+                        glTranslatef(0.0f, 0.1f, 0.0f);
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
 
                 // Ring finger
-                glPushMatrix();
-                    glScalef(0.7f, 0.7f, 0.7f);
-                    glTranslatef(0.1f, 0.1f, 0.0f);
-                    drawFinger(baseAngle, middleAngle, tipAngle);
-                glPopMatrix();
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
+
+                    glPushMatrix();
+                        glScalef(0.7f, 0.7f, 0.7f);
+                        glTranslatef(0.1f, 0.1f, 0.0f);
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
 
                 // Little finger
-                glPushMatrix();
-                    glScalef(0.7f, 0.7f, 0.7f);
-                    glTranslatef(0.2f, 0.1f, 0.0f);
-                    drawFinger(baseAngle, middleAngle, tipAngle);
-                glPopMatrix();
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
+                
+                    glPushMatrix();
+                        glScalef(0.7f, 0.7f, 0.7f);
+                        glTranslatef(0.2f, 0.1f, 0.0f);
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
 
             glPopMatrix();
         glPopMatrix();
@@ -777,64 +941,98 @@ void drawRightArm() {
     glRotatef(rightWholeArmRotateX, 1.0f, 0.0f, 0.0f);
     glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
 
-    gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(.0f, .0f, 1.0f);
+
+        gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
+    glPopAttrib();
+
     glPushMatrix();
-    glTranslatef(0.0f, 0.0f, 0.4f);
-    glRotatef(-45.0f, 0.0f, 0.0f, 1.0f);  // Counter-rotate
-    glRotatef(lowerArmRotateX, 1.0f, 0.0f, 0.0f);
-    glRotatef(-lowerArmRotateY, 0.0f, 1.0f, 0.0f);
-    glRotatef(45.0f, 0.0f, 0.0f, 1.0f);   // Restore rotation
+        glTranslatef(0.0f, 0.0f, 0.4f);
+        glRotatef(-45.0f, 0.0f, 0.0f, 1.0f);  // Counter-rotate
+        glRotatef(lowerArmRotateX, 1.0f, 0.0f, 0.0f);
+        glRotatef(-lowerArmRotateY, 0.0f, 1.0f, 0.0f);
+        glRotatef(45.0f, 0.0f, 0.0f, 1.0f);   // Restore rotation
 
-    gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
+        glPushAttrib(GL_CURRENT_BIT);
+            glColor3f(.0f, .0f, 1.0f);
 
-    // Palm
-    glPushMatrix();
-    glTranslatef(0.0f, 0.0f, 0.6f);
-    gluCylinder(cyObj, 0.2, 0.2, 0.2, 4, 8);
+            gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
+        glPopAttrib();
 
-    // Finger group
-    glPushMatrix();
-    glRotatef(135.0f, 0.0f, 0.0f, 1.0f);  // Tilt the fingers
-    glTranslatef(-0.05f, 0.0f, 0.15f);
+        // Palm
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 0.6f);
+            
+            glPushAttrib(GL_CURRENT_BIT);
+                glColor3f(.0f, .0f, 1.0f);
 
-    // Thumb
-    glPushMatrix();
-    glScalef(0.8f, 0.8f, 0.8f);
-    glTranslatef(-0.1f, -0.1f, -0.2f);
-    glRotatef(-30.0f, 0.0f, 1.0f, 0.0f);  // Tilt the thumb
-    drawFinger(baseAngle, middleAngle, tipAngle);
-    glPopMatrix();
+                gluCylinder(cyObj, 0.2, 0.2, 0.2, 4, 8);
+            glPopAttrib();
 
-    // Index finger
-    glPushMatrix();
-    glScalef(0.7f, 0.7f, 0.7f);
-    glTranslatef(-0.1f, 0.1f, 0.0f);
-    drawFinger(baseAngle, middleAngle, tipAngle);
-    glPopMatrix();
+            // Finger group
+            glPushMatrix();
+                glRotatef(135.0f, 0.0f, 0.0f, 1.0f);  // Tilt the fingers
+                glTranslatef(-0.05f, 0.0f, 0.15f);
 
-    // Middle finger
-    glPushMatrix();
-    glScalef(0.7f, 0.7f, 0.7f);
-    glTranslatef(0.0f, 0.1f, 0.0f);
-    drawFinger(baseAngle, middleAngle, tipAngle);
-    glPopMatrix();
+                // Thumb
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
 
-    // Ring finger
-    glPushMatrix();
-    glScalef(0.7f, 0.7f, 0.7f);
-    glTranslatef(0.1f, 0.1f, 0.0f);
-    drawFinger(baseAngle, middleAngle, tipAngle);
-    glPopMatrix();
+                    glPushMatrix();
+                        glScalef(0.8f, 0.8f, 0.8f);
+                        glTranslatef(-0.1f, -0.1f, -0.2f);
+                        glRotatef(-30.0f, 0.0f, 1.0f, 0.0f);  // Tilt the thumb
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
 
-    // Little finger
-    glPushMatrix();
-    glScalef(0.7f, 0.7f, 0.7f);
-    glTranslatef(0.2f, 0.1f, 0.0f);
-    drawFinger(baseAngle, middleAngle, tipAngle);
-    glPopMatrix();
+                // Index finger
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
 
-    glPopMatrix();
-    glPopMatrix();
+                    glPushMatrix();
+                        glScalef(0.7f, 0.7f, 0.7f);
+                        glTranslatef(-0.1f, 0.1f, 0.0f);
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
+
+                // Middle finger
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
+
+                    glPushMatrix();
+                        glScalef(0.7f, 0.7f, 0.7f);
+                        glTranslatef(0.0f, 0.1f, 0.0f);
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
+
+                // Ring finger
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
+
+                    glPushMatrix();
+                        glScalef(0.7f, 0.7f, 0.7f);
+                        glTranslatef(0.1f, 0.1f, 0.0f);
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
+
+                // Little finger
+                glPushAttrib(GL_CURRENT_BIT);
+                    glColor3f(.18f, .24f, .29f);
+
+                    glPushMatrix();
+                        glScalef(0.7f, 0.7f, 0.7f);
+                        glTranslatef(0.2f, 0.1f, 0.0f);
+                        drawFinger(baseAngle, middleAngle, tipAngle);
+                    glPopMatrix();
+                glPopAttrib();
+
+            glPopMatrix();
+        glPopMatrix();
 
     glPopMatrix();
 }
@@ -1020,13 +1218,12 @@ void bullet() {
 
 
 void pistol() {
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
+    // glClearColor(0.0, 0.0, 0.0, 0.0);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glEnable(GL_DEPTH_TEST);
     
     glRotatef(-90, 1.0, 0.0, 0.0);
     
-
     //pistol body
     glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, pistolBody);
@@ -1183,69 +1380,73 @@ void drawLightSrcSphere() {
     */
 }
 
-void drawInnerLeftLeg() {
-    // Draw the cylinder
-    gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
-
-    // Draw the bottom cap
-    glPushMatrix();
-        glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-        gluDisk(dkObj, 0.0, .2, 4, 1); // Disk matches the radius of the cylinder
-    glPopMatrix();
-
-    // Draw the top cap
-    glPushMatrix();
-        glTranslatef(0.0f, 0.0f, 1.5f); // Top of the cylinder
-        gluDisk(dkObj, 0.0, .2, 4, 1);
-    glPopMatrix();
-}
-
-void drawInnerRightLeg() {
-    // Draw the cylinder
-    gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
-
-    // Draw the bottom cap
-    glPushMatrix();
-        glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-        gluDisk(dkObj, 0.0, .2, 4, 1);
-    glPopMatrix();
-
-    // Draw the top cap
-    glPushMatrix();
-        glTranslatef(0.0f, 0.0f, 1.5f); // Top of the cylinder
-        gluDisk(dkObj, 0.0, .2, 4, 1);
-    glPopMatrix();
-}
-
-void drawOuterLeftLeg() {
-
-}
-
-void drawOuterRightLeg() {
-    
-}
-
-void drawInnerTorso() {
-    glPushMatrix();
-        glTranslatef(.0f, -.3f, .0f);
-        glRotatef(-90.0f, 1.0f, .0f, .0f);
-        glRotatef(45.0f, .0f, .0f, 1.0f);
+void drawLeftLeg() {
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(1.0f, .65f, .0f);
 
         // Draw the cylinder
-        gluCylinder(cyObj, .35, .5, .85, 4, 8);
+        gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
 
         // Draw the bottom cap
         glPushMatrix();
             glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-            gluDisk(dkObj, 0.0, .35, 4, 1); // Disk with bottom radius of .35
+            gluDisk(dkObj, 0.0, .2, 4, 1); // Disk matches the radius of the cylinder
         glPopMatrix();
 
         // Draw the top cap
         glPushMatrix();
-            glTranslatef(0.0f, 0.0f, .85f); // Top of the cylinder
-            gluDisk(dkObj, 0.0, .5, 4, 1); // Disk with top radius of .5
+            glTranslatef(0.0f, 0.0f, 1.5f); // Top of the cylinder
+            gluDisk(dkObj, 0.0, .2, 4, 1);
         glPopMatrix();
-    glPopMatrix();
+    glPopAttrib();
+}
+
+void drawRightLeg() {
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(.0f, .0f, 1.0f);
+
+        // Draw the cylinder
+        gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
+
+        // Draw the bottom cap
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
+            gluDisk(dkObj, 0.0, .2, 4, 1);
+        glPopMatrix();
+
+        // Draw the top cap
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 1.5f); // Top of the cylinder
+            gluDisk(dkObj, 0.0, .2, 4, 1);
+        glPopMatrix();
+    glPopAttrib();
+}
+
+void drawInnerTorso() {
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(.18f, .24f, .29f);
+
+        glPushMatrix();
+            glTranslatef(.0f, -.3f, .0f);
+            glRotatef(-90.0f, 1.0f, .0f, .0f);
+            glRotatef(45.0f, .0f, .0f, 1.0f);
+
+            // Draw the cylinder
+            gluCylinder(cyObj, .35, .5, .85, 4, 8);
+
+            // Draw the bottom cap
+            glPushMatrix();
+                glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
+                gluDisk(dkObj, 0.0, .35, 4, 1); // Disk with bottom radius of .35
+            glPopMatrix();
+
+            // Draw the top cap
+            glPushMatrix();
+                glTranslatef(0.0f, 0.0f, .85f); // Top of the cylinder
+                gluDisk(dkObj, 0.0, .5, 4, 1); // Disk with top radius of .5
+            glPopMatrix();
+        glPopMatrix();
+    glPopAttrib();
 }
 
 // Function to draw a 3D prism
@@ -1305,14 +1506,25 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
 }
 
 void drawOuterTorso() {
-    // drawPrism(float x, float y, float z, int numSides, float height, float scale, float rotX, float rotY, float rotZ)
-    drawPrism(-.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
-    drawPrism(.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, -97.0f);
-    
-    drawPrism(-.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
-    drawPrism(.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, -97.0f);
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(1.0f, .65f, .0f);
 
-    drawPrism(.0f, .13f, -.48f, 3, .5f, .35f, 83.0f, 26.0f, .0f);
+        drawPrism(-.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
+        drawPrism(.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, -97.0f);
+    glPopAttrib();
+    
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(.0f, .0f, 1.0f);
+
+        drawPrism(-.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
+        drawPrism(.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, -97.0f);
+    glPopAttrib();
+
+    glPushAttrib(GL_CURRENT_BIT);
+        glColor3f(1.0f, .0f, .0f);
+
+        drawPrism(.0f, .13f, -.48f, 3, .5f, .35f, 83.0f, 26.0f, .0f);
+    glPopAttrib();
 }
 
 void display() {
@@ -1405,11 +1617,8 @@ void display() {
         glRotatef(leftLegRotationAngle, 1.0f, .0f, .0f); // TODO: Rotate the leg like walking and running animation
         glRotatef(45.0f, .0f, .0f, 1.0f);
 
-        // Inner left leg
-        drawInnerLeftLeg();
-
-        // outer left leg
-
+        // left leg
+        drawLeftLeg();
     glPopMatrix();
     
     glPushMatrix();
@@ -1417,11 +1626,9 @@ void display() {
         glRotatef(rightLegRotationAngle, 1.0f, .0f, .0f);
         glRotatef(45.0f, .0f, .0f, 1.0f);
 
-        // Inner right leg
-        drawInnerRightLeg();
+        // right leg
+        drawRightLeg();
 
-        // outer right leg
-        
     glPopMatrix();
 
     // Inner torso
@@ -1447,7 +1654,7 @@ void display() {
     glPopMatrix();
     
     // Inner head
-    drawInnerHead();
+    // drawInnerHead();
 
     glPushMatrix();
         glTranslatef(.0f, .29f, -.2f);
@@ -1567,9 +1774,11 @@ int main(int argc, char** argv) {
     glutCreateWindow("BACS2173 - Assignment");          // Create window with title
 
 	glEnable(GL_DEPTH_TEST); // Enable depth testing
-    // glEnable(GL_TEXTURE_2D);
+    // glEnable(GL_LIGHTING);
 
-    innerbody = loadTexture("inner_body.bmp");
+    innerbody = loadTexture("blackmetal.bmp");
+    outerbody1 = loadTexture("bluemetal.bmp");
+    outerbody2 = loadTexture("gold.bmp");
 
     pistolBody = loadTexture("pistolsilver.bmp");
     pistolHandle = loadTexture("brownleather.bmp");
