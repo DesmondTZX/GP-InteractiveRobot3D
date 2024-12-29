@@ -70,7 +70,7 @@ bool armDirection = true; // Direction of arm rotation
 // Shooting Animation
 bool isShooting = false;
 float weaponX = 0.0, weaponY = 0.0, weaponZ = 0.0;
-float bulletSpeed = 0.01;
+float bulletSpeed = 0.001;
 bool isGun = false;
 // BITMAP BMP;
 // HBITMAP hBMP = NULL;
@@ -1006,7 +1006,7 @@ void bullet() {
 
     glPushMatrix();
     glRotatef(90, 0.0, 0.0, 1.0);
-    glTranslatef(0.0, -0.15, 0.0);
+    glTranslatef(0.0, -0.15, 0.1);
     sickleCorn(0.01, 0.0, 0.05);
     glPopMatrix();
 }
