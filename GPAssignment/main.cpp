@@ -1030,23 +1030,6 @@ void sickle() {
     glPopMatrix();
 }
 
-void drawFinger() {
-    // Base segment
-    gluCylinder(cyObj, 0.05, 0.05, 0.2, 8, 8);
-    glPushMatrix();
-    glTranslatef(0.0f, 0.0f, 0.2f);
-    glRotatef(20.0f, 1.0f, 0.0f, 0.0f);  // Bend the finger slightly
-    // Middle segment
-    gluCylinder(cyObj, 0.04, 0.04, 0.15, 8, 8);
-    glPushMatrix();
-    glTranslatef(0.0f, 0.0f, 0.15f);
-    glRotatef(20.0f, 1.0f, 0.0f, 0.0f);  // Further bend
-    // Tip segment
-    gluCylinder(cyObj, 0.03, 0.03, 0.1, 8, 8);
-    glPopMatrix();
-    glPopMatrix();
-}
-
 void drawFinger(GLfloat baseAngle, GLfloat middleAngle, GLfloat tipAngle) {
     // Base segment
     gluCylinder(cyObj, 0.05, 0.05, 0.2, 8, 8);
