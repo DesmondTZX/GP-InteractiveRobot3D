@@ -213,8 +213,6 @@ void handleKeys(unsigned char key, int x, int y) {
         bulletSpeed = 0.01;
         isGun = false;
 
-        break;
-
     default:
         if (cameraView) {
             // Movement keys
@@ -1026,7 +1024,7 @@ void pistol() {
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glColor3f(0.83, 0.83, 0.83);
     pistolCube(0.35, 0.1, 0.1);
-    // glDeleteTextures(1, &textureArr[0]);
+    glDeleteTextures(1, &textureArr[1]);
     glPopMatrix();
 
     glPushMatrix();
@@ -1042,7 +1040,7 @@ void pistol() {
     glRotatef(110, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
     pistolCube(0.2, 0.08, 0.08);
-    // glDeleteTextures(1, &textureArr[1]);
+    glDeleteTextures(1, &textureArr[2]);
     glPopMatrix();
 
     glPushMatrix();
@@ -1060,7 +1058,7 @@ void pistol() {
     glRotatef(270, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.03, 0.03);
-    // glDeleteTextures(1, &textureArr[0]);
+    glDeleteTextures(1, &textureArr[1]);
     glPopMatrix();
 
     glPushMatrix();
@@ -1085,7 +1083,7 @@ void pistol() {
     glRotatef(270, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.04, 0.02);
-    // glDeleteTextures(1, &textureArr[0]);
+    glDeleteTextures(1, &textureArr[1]);
     glPopMatrix();
 
     glPushMatrix();
@@ -1103,7 +1101,7 @@ void pistol() {
     glRotatef(180, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.04, 0.02);
-    // glDeleteTextures(1, &textureArr[0]);
+    glDeleteTextures(1, &textureArr[1]);
     glPopMatrix();
 
     glPushMatrix();
@@ -1121,7 +1119,7 @@ void pistol() {
     glRotatef(230, 0.0, 1.0, 0.0);
     glColor3f(0.85, 0.85, 0.85);
     pistolCube(0.08, 0.02, 0.02);
-    // glDeleteTextures(1, &textureArr[0]);
+    glDeleteTextures(1, &textureArr[1]);
     glPopMatrix();
     
     glPushMatrix();
