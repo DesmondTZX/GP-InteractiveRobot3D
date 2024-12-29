@@ -13,8 +13,6 @@
 #define WINDOW_HEIGHT 800
 #define WINDOW_WIDTH 800
 
-int viewingMode = 0;
-
 GLUquadricObj* cyObj = NULL;
 GLUquadricObj* spObj = NULL;
 GLUquadricObj* dkObj = NULL;
@@ -30,6 +28,7 @@ bool cameraView = false;
 bool isOrtho = false;
 bool coordLines = false;
 bool drawMode = true;
+bool textureView = false;
 
 float camX = 0.0f, camY = 0.0f, camZ = 8.0f; // Camera position
 float pitch = 0.0f, yaw = 0.0f;              // Camera rotation (angles in degrees)
@@ -113,6 +112,10 @@ void handleKeys(unsigned char key, int x, int y) {
 
     case 91: // [ key
         drawMode = !drawMode;
+        break;
+
+    case 93: // ] key
+        textureView = !textureView;
         break;
 
     // Rotate the arm
@@ -1180,117 +1183,49 @@ void drawLightSrcSphere() {
     */
 }
 
-void display() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
+void drawInnerLeftLeg() {
+    // Draw the cylinder
+    gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
 
-    glLineWidth(1.0f);
-
-    // cyObj
-    cyObj = gluNewQuadric();
-
-    spObj = gluNewQuadric();
-
-    dkObj = gluNewQuadric();
-
-    if (cameraView) {
-        applyCameraTransformations(); // Use interactive camera
-        renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_HELVETICA_18, "Camera Movement: ON");
-    } else {
-        applyDefaultView(); // Use fixed default view
-        renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_HELVETICA_18, "Camera Movement: OFF");
-    }
-
-    if (coordLines) {
-        renderBitmapString(-2.0f, 1.65f, GLUT_BITMAP_HELVETICA_18, "Coordinate Lines: ON");
-
-        glBegin(GL_LINES);
-            glVertex2f(-WINDOW_WIDTH, .0f);
-            glVertex2f(WINDOW_WIDTH, .0f);
-            
-            glVertex2f(.0f, -WINDOW_HEIGHT);
-            glVertex2f(.0f, WINDOW_HEIGHT);
-        glEnd();
-    } else {
-        renderBitmapString(-2.0f, 1.65f, GLUT_BITMAP_HELVETICA_18, "Coordinate Lines: OFF");
-    }
-
-    if (isOrtho) {
-        renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Orthogonal View");
-    } else {
-        renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Perspective View");
-    }
-
-    if (drawMode) {
-        renderBitmapString(-2.0f, 1.35f, GLUT_BITMAP_HELVETICA_18, "Draw Mode: Line");
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    } else {
-        renderBitmapString(-2.0f, 1.35f, GLUT_BITMAP_HELVETICA_18, "Draw Mode: Fill");
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
-    // enable texturing and auto assign normals for quadric objects
-    //gluQuadricTexture(cyObj, GL_TRUE);
-    //gluQuadricNormals(cyObj, GLU_SMOOTH);
-
-    // bind texture to object
-    //glBindTexture(GL_TEXTURE_2D, innerbody);
-    
-    if (isGun) {
-        glPushMatrix();
-            glEnable(GL_TEXTURE_2D);
-            glTranslatef(1.6f, 0.9f, 0.0f);
-            glScalef(2.5f, 2.5f, 2.5f);
-            shootingPistol();
-            glDisable(GL_TEXTURE_2D);
-        glPopMatrix();
-    }
-    
-    // Inner left leg
+    // Draw the bottom cap
     glPushMatrix();
-        glTranslatef(-.3f, -.201f, .0f);
-        glRotatef(leftLegRotationAngle, 1.0f, .0f, .0f); // TODO: Rotate the leg like walking and running animation
-        glRotatef(45.0f, .0f, .0f, 1.0f);
-
-        // Draw the cylinder
-        gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
-
-        // Draw the bottom cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-            gluDisk(dkObj, 0.0, .2, 4, 1); // Disk matches the radius of the cylinder
-        glPopMatrix();
-
-        // Draw the top cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 1.5f); // Top of the cylinder
-            gluDisk(dkObj, 0.0, .2, 4, 1);
-        glPopMatrix();
+        glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
+        gluDisk(dkObj, 0.0, .2, 4, 1); // Disk matches the radius of the cylinder
     glPopMatrix();
 
-    // Inner right leg
+    // Draw the top cap
     glPushMatrix();
-        glTranslatef(.3f, -.201f, .0f);
-        glRotatef(rightLegRotationAngle, 1.0f, .0f, .0f);
-        glRotatef(45.0f, .0f, .0f, 1.0f);
+        glTranslatef(0.0f, 0.0f, 1.5f); // Top of the cylinder
+        gluDisk(dkObj, 0.0, .2, 4, 1);
+    glPopMatrix();
+}
 
-        // Draw the cylinder
-        gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
+void drawInnerRightLeg() {
+    // Draw the cylinder
+    gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
 
-        // Draw the bottom cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-            gluDisk(dkObj, 0.0, .2, 4, 1);
-        glPopMatrix();
-
-        // Draw the top cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 1.5f); // Top of the cylinder
-            gluDisk(dkObj, 0.0, .2, 4, 1);
-        glPopMatrix();
+    // Draw the bottom cap
+    glPushMatrix();
+        glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
+        gluDisk(dkObj, 0.0, .2, 4, 1);
     glPopMatrix();
 
-    // Inner torso
+    // Draw the top cap
+    glPushMatrix();
+        glTranslatef(0.0f, 0.0f, 1.5f); // Top of the cylinder
+        gluDisk(dkObj, 0.0, .2, 4, 1);
+    glPopMatrix();
+}
+
+void drawOuterLeftLeg() {
+
+}
+
+void drawOuterRightLeg() {
+    
+}
+
+void drawInnerTorso() {
     glPushMatrix();
         glTranslatef(.0f, -.3f, .0f);
         glRotatef(-90.0f, 1.0f, .0f, .0f);
@@ -1311,44 +1246,201 @@ void display() {
             gluDisk(dkObj, 0.0, .5, 4, 1); // Disk with top radius of .5
         glPopMatrix();
     glPopMatrix();
+}
+
+// Function to draw a 3D prism
+void drawPrism(float x, float y, float z, int numSides, float height, float scale, float rotX, float rotY, float rotZ) {
+    if (numSides < 3) {
+        printf("Prism must have at least 3 sides.\n");
+        return;
+    }
+
+    float angleStep = 2.0f * M_PI / numSides;
+
+    glPushMatrix(); // Save the current transformation
+    glTranslatef(x, y, z); // Move to the desired position
+    glRotatef(rotX, 1.0f, 0.0f, 0.0f); // Rotate around the X axis
+    glRotatef(rotY, 0.0f, 1.0f, 0.0f); // Rotate around the Y axis
+    glRotatef(rotZ, 0.0f, 0.0f, 1.0f); // Rotate around the Z axis
+    glScalef(scale, scale, scale); // Apply the scaling
+
+    // Draw the bottom face
+    glBegin(GL_POLYGON);
+    for (int i = 0; i < numSides; ++i) {
+        float angle = i * angleStep;
+        float xPos = cos(angle);
+        float zPos = sin(angle);
+        glVertex3f(xPos, 0.0f, zPos); // Bottom vertices
+    }
+    glEnd();
+
+    // Draw the top face
+    glBegin(GL_POLYGON);
+    for (int i = 0; i < numSides; ++i) {
+        float angle = i * angleStep;
+        float xPos = cos(angle);
+        float zPos = sin(angle);
+        glVertex3f(xPos, height, zPos); // Top vertices
+    }
+    glEnd();
+
+    // Draw the side faces
+    glBegin(GL_QUADS);
+    for (int i = 0; i < numSides; ++i) {
+        float angle1 = i * angleStep;
+        float angle2 = ((i + 1) % numSides) * angleStep;
+
+        float x1 = cos(angle1), z1 = sin(angle1);
+        float x2 = cos(angle2), z2 = sin(angle2);
+
+        // Four vertices of the quad
+        glVertex3f(x1, 0.0f, z1); // Bottom-left
+        glVertex3f(x2, 0.0f, z2); // Bottom-right
+        glVertex3f(x2, height, z2); // Top-right
+        glVertex3f(x1, height, z1); // Top-left
+    }
+    glEnd();
+
+    glPopMatrix(); // Restore the previous transformation
+}
+
+void drawOuterTorso() {
+    // drawPrism(float x, float y, float z, int numSides, float height, float scale, float rotX, float rotY, float rotZ)
+    drawPrism(-.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
+    drawPrism(.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, -97.0f);
     
+    drawPrism(-.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
+    drawPrism(.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, -97.0f);
+
+    drawPrism(.0f, .13f, -.48f, 3, .5f, .35f, 83.0f, 26.0f, .0f);
+}
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+    glLineWidth(1.0f);
+
+    // cyObj
+    cyObj = gluNewQuadric();
+
+    spObj = gluNewQuadric();
+
+    dkObj = gluNewQuadric();
+
+    if (cameraView) {
+        applyCameraTransformations(); // Use interactive camera
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_HELVETICA_18, "Camera Movement: ON");
+    } else {
+        applyDefaultView(); // Use fixed default view
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_HELVETICA_18, "Camera Movement: OFF");
+    }
+
+    if (coordLines) {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.65f, GLUT_BITMAP_HELVETICA_18, "Coordinate Lines: ON");
+
+        glBegin(GL_LINES);
+            glVertex2f(-WINDOW_WIDTH, .0f);
+            glVertex2f(WINDOW_WIDTH, .0f);
+            
+            glVertex2f(.0f, -WINDOW_HEIGHT);
+            glVertex2f(.0f, WINDOW_HEIGHT);
+        glEnd();
+    } else {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.65f, GLUT_BITMAP_HELVETICA_18, "Coordinate Lines: OFF");
+    }
+
+    if (isOrtho) {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Orthogonal View");
+    } else {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Perspective View");
+    }
+
+    if (drawMode) {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.35f, GLUT_BITMAP_HELVETICA_18, "Draw Mode: Line");
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.35f, GLUT_BITMAP_HELVETICA_18, "Draw Mode: Fill");
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+
+    if (textureView) {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.15f, GLUT_BITMAP_HELVETICA_18, "Texture Mode: ON");
+        glEnable(GL_TEXTURE_2D);
+    } else {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        renderBitmapString(-2.0f, 1.15f, GLUT_BITMAP_HELVETICA_18, "Texture Mode: OFF");
+        glDisable(GL_TEXTURE_2D);
+    }
+
+    // enable texturing and auto assign normals for quadric objects
+    //gluQuadricTexture(cyObj, GL_TRUE);
+    //gluQuadricNormals(cyObj, GLU_SMOOTH);
+
+    // bind texture to object
+    //glBindTexture(GL_TEXTURE_2D, innerbody);
+    
+    if (isGun) {
+        glPushMatrix();
+            // glEnable(GL_TEXTURE_2D);
+            glTranslatef(1.6f, 0.9f, 0.0f);
+            glScalef(2.5f, 2.5f, 2.5f);
+            shootingPistol();
+            // glDisable(GL_TEXTURE_2D);
+        glPopMatrix();
+    }
+    
+    
+    glPushMatrix();
+        glTranslatef(-.3f, -.201f, .0f);
+        glRotatef(leftLegRotationAngle, 1.0f, .0f, .0f); // TODO: Rotate the leg like walking and running animation
+        glRotatef(45.0f, .0f, .0f, 1.0f);
+
+        // Inner left leg
+        drawInnerLeftLeg();
+
+        // outer left leg
+
+    glPopMatrix();
+    
+    glPushMatrix();
+        glTranslatef(.3f, -.201f, .0f);
+        glRotatef(rightLegRotationAngle, 1.0f, .0f, .0f);
+        glRotatef(45.0f, .0f, .0f, 1.0f);
+
+        // Inner right leg
+        drawInnerRightLeg();
+
+        // outer right leg
+        
+    glPopMatrix();
+
+    // Inner torso
+    drawInnerTorso();
+    // outer torso 
+    drawOuterTorso();
+
     // Inner chest
     drawInnerChest();
-
     // outer chest
     drawOuterChest();
 
-    
     // whole left arm
-        // Draw the bottom cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-            gluDisk(dkObj, 0.0, .55, 6, 1); // Disk with bottom radius of .55
-        glPopMatrix();
-
-        // Draw the top cap
-        glPushMatrix();
-            glTranslatef(0.0f, 0.0f, .35f); // Top of the cylinder
-            gluDisk(dkObj, 0.0, .85, 6, 1); // Disk with top radius of .85
-        glPopMatrix();
-    glPopMatrix();
-
-    // outer chest front (orange)
-    glPushMatrix();
-
-    glPopMatrix();
-
-    // outer chest front (blue)
-    glPushMatrix();
-
-    glPopMatrix();
-
     glPushMatrix();
         glTranslatef(-.65f, .8f, .0f);
         drawLeftArm();
     glPopMatrix();
     
-
+    // whole right arm
     glPushMatrix();
         glTranslatef(0.65f, .8f, .0f);
         drawRightArm();
