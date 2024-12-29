@@ -20,7 +20,7 @@ GLUquadricObj* spObj = NULL;
 GLUquadricObj* dkObj = NULL;
 
 GLuint innerbody;
-GLuint textureArr[2];
+GLuint textureArr[3];
 
 // Camera parameters
 bool cameraView = false;
@@ -110,24 +110,6 @@ void handleKeys(unsigned char key, int x, int y) {
         drawMode = !drawMode;
         break;
 
-    default:
-        if (cameraView) {
-            // Movement keys
-            switch (key) {
-            case 'w': camY += moveStep; break; // Move camera up
-            case 's': camY -= moveStep; break; // Move camera down
-            case 'a': camX -= moveStep; break; // Move camera left
-            case 'd': camX += moveStep; break; // Move camera right
-
-            case 45: // minus key (not on numpad)
-                camZ += moveStep;
-                break;
-            case 61: // equal key
-                camZ -= moveStep;
-                break;
-            default: break;
-            }
-		}
     // Rotate the arm
 	case '1':
         if (leftWholeArmRotateX > 0 && wholeArmRotateZ == 90) {
@@ -230,6 +212,27 @@ void handleKeys(unsigned char key, int x, int y) {
         weaponX = 0.0, weaponY = 0.0, weaponZ = 0.0;
         bulletSpeed = 0.01;
         isGun = false;
+
+        break;
+
+    default:
+        if (cameraView) {
+            // Movement keys
+            switch (key) {
+            case 'w': camY += moveStep; break; // Move camera up
+            case 's': camY -= moveStep; break; // Move camera down
+            case 'a': camX -= moveStep; break; // Move camera left
+            case 'd': camX += moveStep; break; // Move camera right
+
+            case 45: // minus key (not on numpad)
+                camZ += moveStep;
+                break;
+            case 61: // equal key
+                camZ -= moveStep;
+                break;
+            default: break;
+            }
+		}
     }
 
     glutPostRedisplay(); // Request a redraw of the scene
@@ -283,41 +286,7 @@ GLuint loadTexture(const char* filename) {
 
     return texture;
 }
-/*
-GLuint loadTexture2(LPCSTR filename) {
-    GLuint texture = 0;
 
-    // Convert LPCSTR to LPCWSTR
-    int wchars_num = MultiByteToWideChar(CP_ACP, 0, filename, -1, NULL, 0);
-    wchar_t* wstr = new wchar_t[wchars_num];
-    MultiByteToWideChar(CP_ACP, 0, filename, -1, wstr, wchars_num);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-    HBITMAP hBMP = (HBITMAP)LoadImage(GetModuleHandle(NULL),
-        wstr, IMAGE_BITMAP, 0, 0,
-        LR_CREATEDIBSECTION | LR_LOADFROMFILE);
-
-    delete[] wstr;  // Free the allocated memory
-
-    if (!hBMP) {
-        return 0;  // Return 0 if loading the image failed
-    }
-
-    BITMAP BMP;
-    GetObject(hBMP, sizeof(BMP), &BMP);
-
-    glEnable(GL_TEXTURE_2D);
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, BMP.bmWidth, BMP.bmHeight, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, BMP.bmBits);
-
-    DeleteObject(hBMP);
-
-    return texture;
-}
-*/
 void handleMouse(int button, int state, int x, int y) {
     if (cameraView) {
         if (button == 3) { // Scroll up (zoom in)
@@ -1053,7 +1022,7 @@ void pistol() {
 
     //pistol body
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[0]);
+    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glColor3f(0.83, 0.83, 0.83);
     pistolCube(0.35, 0.1, 0.1);
@@ -1067,7 +1036,7 @@ void pistol() {
 
     //pistol handle
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
+    glBindTexture(GL_TEXTURE_2D, textureArr[2]);
     // textureArr[1] = loadTexture2("brownleather.bmp");
     glTranslatef(0.05, 0.01, 0.05);
     glRotatef(110, 0.0, 1.0, 0.0);
@@ -1085,7 +1054,7 @@ void pistol() {
 
     //pistol scope
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[0]);
+    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glTranslatef(0.3, 0.04, 0.01);
     glRotatef(270, 0.0, 1.0, 0.0);
@@ -1110,7 +1079,7 @@ void pistol() {
 
     //pistol press space straight
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[0]);
+    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glTranslatef(0.2, 0.03, -0.05);
     glRotatef(270, 0.0, 1.0, 0.0);
@@ -1128,7 +1097,7 @@ void pistol() {
 
     //pistol press space horizontal
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[0]);
+    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glTranslatef(0.2, 0.03, -0.05);
     glRotatef(180, 0.0, 1.0, 0.0);
@@ -1146,7 +1115,7 @@ void pistol() {
 
     //pistol shooting button
     glPushMatrix();
-    glBindTexture(GL_TEXTURE_2D, textureArr[0]);
+    glBindTexture(GL_TEXTURE_2D, textureArr[1]);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glTranslatef(0.16, 0.043, -0.025);
     glRotatef(230, 0.0, 1.0, 0.0);
@@ -1177,7 +1146,7 @@ void bulletShoot() {
     glPushMatrix();
     // GLuint textureArr[1];
     // textureArr[0] = loadTexture2("bullet.bmp");
-    glBindTexture(GL_TEXTURE_2D, textureArr[2]);
+    glBindTexture(GL_TEXTURE_2D, textureArr[3]);
     glTranslatef(0.3, 0.05, 0.05);
     glColor3f(1.0, 1.0, 1.0);
     bullet();
@@ -1506,9 +1475,9 @@ int main(int argc, char** argv) {
 
     innerbody = loadTexture("inner_body.bmp");
 
-    textureArr[0] = loadTexture("pistolsilver.bmp");
-    textureArr[1] = loadTexture("brownleather.bmp");
-    textureArr[2] = loadTexture("bullet.bmp");
+    textureArr[1] = loadTexture("pistolsilver.bmp");
+    textureArr[2] = loadTexture("brownleather.bmp");
+    textureArr[3] = loadTexture("bullet.bmp");
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
