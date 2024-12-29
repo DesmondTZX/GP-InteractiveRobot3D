@@ -14,12 +14,12 @@
 #define WINDOW_WIDTH 800
 
 GLUquadricObj* cyObj = NULL;
-GLUquadricObj* spObj = NULL;
 GLUquadricObj* dkObj = NULL;
 
 GLuint innerbody;
 GLuint outerbody1;
 GLuint outerbody2;
+GLuint redbody;
 
 GLuint pistolHandle;
 GLuint pistolBody;
@@ -399,6 +399,8 @@ void applyDefaultView() {
 void drawOuterHeadFirstLyr() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        
+        glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         glPushMatrix();
             glTranslatef(.0f, .8f, .0f);
@@ -459,6 +461,7 @@ void drawOuterHeadFirstLyr() {
 void drawEyes() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .0f, .0f);
+        glBindTexture(GL_TEXTURE_2D, redbody);
 
         glPushMatrix();
             glTranslatef(.0f, .6f, .0f);
@@ -478,6 +481,8 @@ void drawOuterHeadSecondLyr() {
     // todo: add materials and normals for texturing/coloring
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+
+       glBindTexture(GL_TEXTURE_2D, outerbody2);
 
         glPushMatrix();
             glTranslatef(.0f, .6f, .0f);
@@ -739,6 +744,7 @@ void drawInnerChest() {
     glPushAttrib(GL_CURRENT_BIT);
         glPushMatrix();
             glColor3f(.18f, .24f, .29f);
+            glBindTexture(GL_TEXTURE_2D, innerbody);
 
             glTranslatef(.0f, .56f, .0f);
             glRotatef(-90.0f, 1.0f, .0f, .0f);
@@ -766,6 +772,7 @@ void drawOuterChest() {
     // outer chest front (orange)
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        glBindTexture(GL_TEXTURE_2D, outerbody2);
     
         glPushMatrix();
             glTranslatef(.0f, .7f, .0f);
@@ -780,6 +787,7 @@ void drawOuterChest() {
     // outer chest front (blue)
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         glPushMatrix();
             glTranslatef(.0f, .6f, .0f);
@@ -841,6 +849,7 @@ void drawLeftArm() {
 
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        glBindTexture(GL_TEXTURE_2D, outerbody2);
 
         gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
     glPopAttrib();
@@ -854,6 +863,7 @@ void drawLeftArm() {
 
         glPushAttrib(GL_CURRENT_BIT);
             glColor3f(1.0f, .65f, .0f);
+            glBindTexture(GL_TEXTURE_2D, outerbody2);
 
             gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
         glPopAttrib();
@@ -862,11 +872,9 @@ void drawLeftArm() {
         glPushMatrix();
             glTranslatef(0.0f, 0.0f, 0.6f);
             
-            glPushAttrib(GL_CURRENT_BIT);
                 glColor3f(1.0f, .65f, .0f);
 
                 gluCylinder(cyObj, 0.2, 0.2, 0.2, 4, 8);
-            glPopAttrib();
 
             // Finger group
             glPushMatrix();
@@ -876,6 +884,7 @@ void drawLeftArm() {
                 // Thumb
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.8f, 0.8f, 0.8f);
@@ -888,6 +897,7 @@ void drawLeftArm() {
                 // Index finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.7f, 0.7f, 0.7f);
@@ -899,6 +909,7 @@ void drawLeftArm() {
                 // Middle finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.7f, 0.7f, 0.7f);
@@ -910,6 +921,7 @@ void drawLeftArm() {
                 // Ring finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.7f, 0.7f, 0.7f);
@@ -921,6 +933,7 @@ void drawLeftArm() {
                 // Little finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
                 
                     glPushMatrix();
                         glScalef(0.7f, 0.7f, 0.7f);
@@ -943,6 +956,7 @@ void drawRightArm() {
 
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
     glPopAttrib();
@@ -956,6 +970,7 @@ void drawRightArm() {
 
         glPushAttrib(GL_CURRENT_BIT);
             glColor3f(.0f, .0f, 1.0f);
+            glBindTexture(GL_TEXTURE_2D, outerbody1);
 
             gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
         glPopAttrib();
@@ -966,6 +981,7 @@ void drawRightArm() {
             
             glPushAttrib(GL_CURRENT_BIT);
                 glColor3f(.0f, .0f, 1.0f);
+                glBindTexture(GL_TEXTURE_2D, outerbody1);
 
                 gluCylinder(cyObj, 0.2, 0.2, 0.2, 4, 8);
             glPopAttrib();
@@ -978,6 +994,7 @@ void drawRightArm() {
                 // Thumb
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.8f, 0.8f, 0.8f);
@@ -990,6 +1007,7 @@ void drawRightArm() {
                 // Index finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.7f, 0.7f, 0.7f);
@@ -1001,6 +1019,7 @@ void drawRightArm() {
                 // Middle finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.7f, 0.7f, 0.7f);
@@ -1012,6 +1031,7 @@ void drawRightArm() {
                 // Ring finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.7f, 0.7f, 0.7f);
@@ -1023,6 +1043,7 @@ void drawRightArm() {
                 // Little finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
                         glScalef(0.7f, 0.7f, 0.7f);
@@ -1383,6 +1404,7 @@ void drawLightSrcSphere() {
 void drawLeftLeg() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        glBindTexture(GL_TEXTURE_2D, outerbody2);
 
         // Draw the cylinder
         gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
@@ -1404,6 +1426,7 @@ void drawLeftLeg() {
 void drawRightLeg() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         // Draw the cylinder
         gluCylinder(cyObj, .2, .2, 1.5, 4, 8);
@@ -1425,6 +1448,7 @@ void drawRightLeg() {
 void drawInnerTorso() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.18f, .24f, .29f);
+        glBindTexture(GL_TEXTURE_2D, innerbody);
 
         glPushMatrix();
             glTranslatef(.0f, -.3f, .0f);
@@ -1449,7 +1473,7 @@ void drawInnerTorso() {
     glPopAttrib();
 }
 
-// Function to draw a 3D prism
+// Function to draw a 3D prism with texture coordinates
 void drawPrism(float x, float y, float z, int numSides, float height, float scale, float rotX, float rotY, float rotZ) {
     if (numSides < 3) {
         printf("Prism must have at least 3 sides.\n");
@@ -1471,6 +1495,9 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
         float angle = i * angleStep;
         float xPos = cos(angle);
         float zPos = sin(angle);
+        float s = (xPos + 1.0f) / 2.0f; // Map x from [-1, 1] to [0, 1]
+        float t = (zPos + 1.0f) / 2.0f; // Map z from [-1, 1] to [0, 1]
+        glTexCoord2f(s, t); // Texture coordinates
         glVertex3f(xPos, 0.0f, zPos); // Bottom vertices
     }
     glEnd();
@@ -1481,6 +1508,9 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
         float angle = i * angleStep;
         float xPos = cos(angle);
         float zPos = sin(angle);
+        float s = (xPos + 1.0f) / 2.0f; // Map x from [-1, 1] to [0, 1]
+        float t = (zPos + 1.0f) / 2.0f; // Map z from [-1, 1] to [0, 1]
+        glTexCoord2f(s, t); // Texture coordinates
         glVertex3f(xPos, height, zPos); // Top vertices
     }
     glEnd();
@@ -1494,11 +1524,17 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
         float x1 = cos(angle1), z1 = sin(angle1);
         float x2 = cos(angle2), z2 = sin(angle2);
 
+        // Map texture coordinates
+        float s1 = (float)i / numSides;          // Horizontal mapping for current side
+        float s2 = (float)(i + 1) / numSides;    // Horizontal mapping for next side
+        float tBottom = 0.0f;                    // Bottom texture coordinate
+        float tTop = 1.0f;                       // Top texture coordinate
+
         // Four vertices of the quad
-        glVertex3f(x1, 0.0f, z1); // Bottom-left
-        glVertex3f(x2, 0.0f, z2); // Bottom-right
-        glVertex3f(x2, height, z2); // Top-right
-        glVertex3f(x1, height, z1); // Top-left
+        glTexCoord2f(s1, tBottom); glVertex3f(x1, 0.0f, z1); // Bottom-left
+        glTexCoord2f(s2, tBottom); glVertex3f(x2, 0.0f, z2); // Bottom-right
+        glTexCoord2f(s2, tTop);    glVertex3f(x2, height, z2); // Top-right
+        glTexCoord2f(s1, tTop);    glVertex3f(x1, height, z1); // Top-left
     }
     glEnd();
 
@@ -1508,6 +1544,7 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
 void drawOuterTorso() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        glBindTexture(GL_TEXTURE_2D, outerbody2);
 
         drawPrism(-.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
         drawPrism(.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, -97.0f);
@@ -1515,6 +1552,7 @@ void drawOuterTorso() {
     
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         drawPrism(-.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
         drawPrism(.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, -97.0f);
@@ -1522,6 +1560,7 @@ void drawOuterTorso() {
 
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .0f, .0f);
+        glBindTexture(GL_TEXTURE_2D, redbody);
 
         drawPrism(.0f, .13f, -.48f, 3, .5f, .35f, 83.0f, 26.0f, .0f);
     glPopAttrib();
@@ -1533,11 +1572,7 @@ void display() {
 
     glLineWidth(1.0f);
 
-    // cyObj
     cyObj = gluNewQuadric();
-
-    spObj = gluNewQuadric();
-
     dkObj = gluNewQuadric();
 
     if (cameraView) {
@@ -1595,11 +1630,11 @@ void display() {
     }
 
     // enable texturing and auto assign normals for quadric objects
-    //gluQuadricTexture(cyObj, GL_TRUE);
-    //gluQuadricNormals(cyObj, GLU_SMOOTH);
-
-    // bind texture to object
-    //glBindTexture(GL_TEXTURE_2D, innerbody);
+    gluQuadricTexture(cyObj, GL_TRUE);
+    gluQuadricNormals(cyObj, GLU_SMOOTH);
+    
+    gluQuadricTexture(dkObj, GL_TRUE);
+    gluQuadricNormals(dkObj, GLU_SMOOTH);
     
     if (isGun) {
         glPushMatrix();
@@ -1776,9 +1811,10 @@ int main(int argc, char** argv) {
 	glEnable(GL_DEPTH_TEST); // Enable depth testing
     // glEnable(GL_LIGHTING);
 
-    innerbody = loadTexture("blackmetal.bmp");
+    innerbody = loadTexture("steel.bmp");
     outerbody1 = loadTexture("bluemetal.bmp");
     outerbody2 = loadTexture("gold.bmp");
+    redbody = loadTexture("rubyred.bmp");
 
     pistolBody = loadTexture("pistolsilver.bmp");
     pistolHandle = loadTexture("brownleather.bmp");
