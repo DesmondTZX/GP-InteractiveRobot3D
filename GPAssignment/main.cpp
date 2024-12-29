@@ -24,6 +24,10 @@ GLuint outerbody2;
 GLuint pistolHandle;
 GLuint pistolBody;
 GLuint bulletTex;
+GLuint steel;
+GLuint black;
+GLuint purple;
+GLuint blade;
 // GLuint textureArr[4];
 
 // Camera parameters
@@ -48,6 +52,8 @@ bool isMousePressed = false;
 float leftWholeArmRotateX = 90.0f;
 float rightWholeArmRotateX = 90.0f;
 float wholeArmRotateZ = 0.0f;
+float wholeLeftArmRotateY = 0.0f;
+float wholeRightArmRotateY = 0.0f;
 float lowerArmRotateX = 0.0f;
 float lowerArmRotateY = 0.0f;
 float rotateAngle = 5.0f;
@@ -77,8 +83,15 @@ bool isShooting = false;
 float weaponX = 0.0, weaponY = 0.0, weaponZ = 0.0;
 float bulletSpeed = 0.001;
 bool isGun = false;
-// BITMAP BMP;
-// HBITMAP hBMP = NULL;
+bool isSword = true;
+
+// Swinging Animation
+bool openWeapon = false;
+bool isSwinging = false;
+bool firstCondition = false;
+bool secondCondition = false;
+bool thirdCondition = false;
+
 
 void handleKeys(unsigned char key, int x, int y) {
     switch (key) {
@@ -193,13 +206,26 @@ void handleKeys(unsigned char key, int x, int y) {
         weaponX = 0;
         weaponY = 0;
         weaponZ = 0;
-
 		break;
+
+    case 'v':
+        openWeapon = true;
+        break;
+    case 'b':
+        isSword = !isSword;
+        break;
+    case 'j':
+        isSwinging = true;
+        wholeLeftArmRotateY = 90.0f;
+        wholeRightArmRotateY = -90.0f;
+        break;
     case 'r':
         // reset animation
         leftWholeArmRotateX = 90.0f;
         rightWholeArmRotateX = 90.0f;
         wholeArmRotateZ = 0.0f;
+        wholeLeftArmRotateY = 0.0f;
+        wholeRightArmRotateY = 0.0f;
         lowerArmRotateX = 0.0f;
         lowerArmRotateY = 0.0f;
         rotateAngle = 5.0f;
@@ -223,6 +249,14 @@ void handleKeys(unsigned char key, int x, int y) {
         weaponX = 0.0, weaponY = 0.0, weaponZ = 0.0;
         bulletSpeed = 0.01;
         isGun = false;
+        isSword = true;
+
+        // Swinging Animation
+        openWeapon = false;
+        isSwinging = false;
+        firstCondition = false;
+        secondCondition = false;
+        thirdCondition = false;
 
     default:
         if (cameraView) {
@@ -791,6 +825,210 @@ void drawOuterChest() {
         glPopMatrix();
     glPopAttrib();
 }
+void drawSword2D() {
+    glBegin(GL_POLYGON);
+    // Blade with gradient
+    glColor3f(1.0f, 1.0f, 0.5f); // Gradient start (lighter gold)
+    glVertex3f(-0.05f, -0.8f, 0.0f); // Bottom left
+    glVertex3f(0.05f, -0.8f, 0.0f);  // Bottom right
+    glColor3f(1.0f, 1.0f, 0.0f); // Gradient end (darker gold)
+    glVertex3f(0.0f, 0.9f, 0.0f);    // Sharp tip
+    glEnd();
+
+    // Handle
+    glBegin(GL_POLYGON);
+    glColor3f(0.5f, 0.5f, 0.5f); // Silver color
+    glVertex3f(-0.025f, -1.0f, 0.0f); // Bottom left (narrower handle)
+    glVertex3f(0.025f, -1.0f, 0.0f);  // Bottom right (narrower handle)
+    glVertex3f(0.025f, -0.5f, 0.0f);  // Top right
+    glVertex3f(-0.025f, -0.5f, 0.0f); // Top left
+    glEnd();
+
+    // Crossguard
+    glBegin(GL_POLYGON);
+    glColor3f(0.8f, 0.8f, 0.0f); // Golden crossguard
+    glVertex3f(-0.3f, -0.75f, 0.0f); // Bottom left
+    glVertex3f(0.3f, -0.75f, 0.0f);  // Bottom right
+    glVertex3f(0.2f, -0.7f, 0.0f);   // Top right
+    glVertex3f(-0.2f, -0.7f, 0.0f);  // Top left
+    glEnd();
+}
+
+void drawSword3D() {
+    float depthStep = 0.01f; // Extrusion depth per step
+    int steps = 8;         // Number of extrusion layers
+
+    // Draw the extruded layers
+    glPushMatrix();
+    for (int i = 0; i <= steps; ++i) {
+        float z = depthStep * (i - steps / 2.0f);
+        glPushMatrix();
+        glTranslatef(0.0f, 0.0f, z);
+        drawSword2D();
+        glPopMatrix();
+    }
+
+    // Connect edges for 3D extrusion (blade)
+    glBegin(GL_QUADS);
+    glColor3f(0.8f, 0.7f, 0.0f); // Side color
+    // Blade sides
+    glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
+    glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
+
+    glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
+    glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
+    glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
+
+    glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
+    glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
+    glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
+    glEnd();
+
+    // Top cap
+    glBegin(GL_POLYGON);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
+    glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
+    glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
+    glEnd();
+
+    // Bottom cap
+    glBegin(GL_POLYGON);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
+    glEnd();
+
+    // Handle extrusion
+    glBegin(GL_QUADS);
+    glColor3f(0.5f, 0.5f, 0.5f);
+    glVertex3f(-0.025f, -1.0f, -depthStep * steps / 2.0f);
+    glVertex3f(0.025f, -1.0f, -depthStep * steps / 2.0f);
+    glVertex3f(0.025f, -1.0f, depthStep * steps / 2.0f);
+    glVertex3f(-0.025f, -1.0f, depthStep * steps / 2.0f);
+
+    glVertex3f(-0.025f, -0.5f, -depthStep * steps / 2.0f);
+    glVertex3f(0.025f, -0.5f, -depthStep * steps / 2.0f);
+    glVertex3f(0.025f, -0.5f, depthStep * steps / 2.0f);
+    glVertex3f(-0.025f, -0.5f, depthStep * steps / 2.0f);
+    glEnd();
+
+    glPopMatrix();
+}
+
+void sickleStick(double tr, double br, double h) {
+    GLUquadricObj* cylinder = NULL;
+    cylinder = gluNewQuadric();
+    gluQuadricDrawStyle(cylinder, GLU_FILL);
+    gluQuadricTexture(cylinder, true);
+    gluCylinder(cylinder, tr, br, h, 20, 20);
+    gluDeleteQuadric(cylinder);
+}
+
+void sickleCorn(double tr, double br, double h) {
+    glRotatef(90, 1.0, 0.0, 0.0);
+    GLUquadricObj* cylinder = NULL;
+    cylinder = gluNewQuadric();
+    gluQuadricDrawStyle(cylinder, GLU_FILL);
+    gluQuadricTexture(cylinder, true);
+    gluCylinder(cylinder, tr, br, h, 10, 10);
+    gluDeleteQuadric(cylinder);
+}
+
+void sickleBlade(float sz, float sh) {
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(0.0, 0.0, sh);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(0.15, 0.0, sh);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(0.15, 0.0, 0.0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
+
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(0.15 / 2, sz, sh / 2);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(0.0, 0.0, sh);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(0.15 / 2, sz, sh / 2);
+
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(0.15 / 2, sz, sh / 2);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(0.0, 0.0, 0.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(0.15, 0.0, 0.0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(0.15 / 2, sz, sh / 2);
+
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(0.15 / 2, sz, sh / 2);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(0.15, 0.0, 0.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(0.15, 0.0, sh);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(0.15 / 2, sz, sh / 2);
+
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(0.15 / 2, sz, sh / 2);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(0.15, 0.0, sh);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(0.0, 0.0, sh);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(0.15 / 2, sz, sh / 2);
+    glEnd();
+}
+
+void sickle() {
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, steel);
+    glRotatef(90, 1.0, 0.0, 0.0);
+    glColor3f(0.75, 0.76, 0.8);
+    sickleStick(0.015, 0.015, 0.7);
+    glPopMatrix();
+
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, purple);
+    glColor3f(0.44, 0.44, 0.43);
+    glTranslatef(0.0, -0.7, 0.0);
+    sickleCorn(0.03, 0.0, 0.15);
+    glPopMatrix();
+
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, black);
+    glTranslatef(0.0, 0.2, 0.0);
+    glRotatef(90, 1.0, 0.0, 0.0);
+    glColor3f(0.44, 0.44, 0.43);
+    sickleStick(0.02, 0.02, 0.2);
+    glPopMatrix();
+
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, purple);
+    glColor3f(0.44, 0.44, 0.43);
+    glTranslatef(0.0, 0.2, 0.0);
+    glRotatef(180, 1.0, 0.0, 0.0);
+    sickleCorn(0.03, 0.0, 0.15);
+    glPopMatrix();
+
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, blade);
+    glColor3f(0.85, 0.85, 0.85);
+    glTranslatef(0.0, 0.2, 0.0);
+    glRotatef(-90, 0.0, 0.0, 1.0);
+    sickleBlade(0.6, 0.01);
+    glPopMatrix();
+}
 
 void drawFinger() {
     // Base segment
@@ -836,7 +1074,8 @@ void drawFinger(GLfloat baseAngle, GLfloat middleAngle, GLfloat tipAngle) {
 void drawLeftArm() {
     // Whole left arm
     glRotatef(-wholeArmRotateZ, 0.0f, 0.0f, 1.0f); 
-    glRotatef(leftWholeArmRotateX, 1.0f, 0.0f, 0.0f); // TODO: Rotate the hand like walking and running animation
+    glRotatef(wholeLeftArmRotateY, 0.0f, 1.0f, 0.0f);
+    glRotatef(leftWholeArmRotateX, 1.0f, 0.0f, 0.0f);
     glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
 
     glPushAttrib(GL_CURRENT_BIT);
@@ -929,6 +1168,26 @@ void drawLeftArm() {
                     glPopMatrix();
                 glPopAttrib();
 
+                if (openWeapon || isSwinging) {
+                    glPushMatrix();
+
+                    if (isSword) {
+                        glTranslatef(0.9f, 0.0f, 0.1f);
+                        glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+                        glRotatef(-90.0f, .0f, 0.0f, 1.0f);
+                        drawSword3D();
+                    }
+                    else {
+                        glTranslatef(0.9f, 0.0f, 0.1f);
+                        glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
+                        glRotatef(-90.0f, .0f, 0.0f, 1.0f);
+                        glScalef(2.0f, 2.0f, 2.0f);
+                        sickle();
+                    }
+                    glPopMatrix();
+                }
+                
+
             glPopMatrix();
         glPopMatrix();
 
@@ -938,6 +1197,7 @@ void drawLeftArm() {
 void drawRightArm() {
     // Whole right arm
     glRotatef(wholeArmRotateZ, 0.0f, 0.0f, 1.0f);
+    glRotatef(wholeRightArmRotateY, 0.0f, 1.0f, 0.0f);
     glRotatef(rightWholeArmRotateX, 1.0f, 0.0f, 0.0f);
     glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
 
@@ -1035,75 +1295,6 @@ void drawRightArm() {
         glPopMatrix();
 
     glPopMatrix();
-}
-
-void sickleStick(double tr, double br, double h) {
-    GLUquadricObj* cylinder = NULL;
-    cylinder = gluNewQuadric();
-    gluQuadricDrawStyle(cylinder, GLU_FILL);
-    gluQuadricTexture(cylinder, true);
-    gluCylinder(cylinder, tr, br, h, 20, 20);
-    gluDeleteQuadric(cylinder);
-}
-
-void sickleCorn(double tr, double br, double h) {
-    glRotatef(90, 1.0, 0.0, 0.0);
-    GLUquadricObj* cylinder = NULL;
-    cylinder = gluNewQuadric();
-    gluQuadricDrawStyle(cylinder, GLU_FILL);
-    gluQuadricTexture(cylinder, true);
-    gluCylinder(cylinder, tr, br, h, 10, 10);
-    gluDeleteQuadric(cylinder);
-}
-
-void sickleBlade(float sz, float sh) {
-    glBegin(GL_QUADS);
-
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(0.0, 0.0, sh);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(0.15, 0.0, sh);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(0.15, 0.0, 0.0);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(0.0, 0.0, 0.0);
-
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(0.15 / 2, sz, sh / 2);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(0.0, 0.0, sh);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(0.0, 0.0, 0.0);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(0.15 / 2, sz, sh / 2);
-
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(0.15 / 2, sz, sh / 2);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(0.0, 0.0, 0.0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(0.15, 0.0, 0.0);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(0.15 / 2, sz, sh / 2);
-
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(0.15 / 2, sz, sh / 2);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(0.15, 0.0, 0.0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(0.15, 0.0, sh);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(0.15 / 2, sz, sh / 2);
-
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(0.15 / 2, sz, sh / 2);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(0.15, 0.0, sh);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(0.0, 0.0, sh);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(0.15 / 2, sz, sh / 2);
-    glEnd();
 }
 
 void pistolCube(float sizeX, float sizeY, float sizeZ) {
@@ -1215,7 +1406,6 @@ void bullet() {
     sickleCorn(0.01, 0.0, 0.05);
     glPopMatrix();
 }
-
 
 void pistol() {
     // glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -1757,6 +1947,48 @@ void updateAnimation(int value) {
         glutPostRedisplay();
     }
 
+    if (isSwinging) {
+       
+        if (!firstCondition) {
+            if (lowerArmRotateY > -90) {
+                lowerArmRotateY -= 1.0f;
+                std::cout << lowerArmRotateY << std::endl;
+            }
+            else {
+                firstCondition = true; // Mark first condition as complete
+            }
+        }
+
+        if (firstCondition && !secondCondition) {
+            if (wholeArmRotateZ < 30) {
+                wholeArmRotateZ += 1.0f;
+            }
+            else {
+                secondCondition = true; // Mark second condition as complete
+            }
+        }
+
+        if (firstCondition && secondCondition && !thirdCondition) {
+            if (baseAngle < BASE_ANGLE_MAX) baseAngle += 1.0f;
+            if (middleAngle < MIDDLE_ANGLE_MAX) middleAngle += 1.5f;
+            if (tipAngle < TIP_ANGLE_MAX) tipAngle += 2.0f;
+
+            // Check if all finger angles have reached their limits
+            if (baseAngle >= BASE_ANGLE_MAX && middleAngle >= MIDDLE_ANGLE_MAX && tipAngle >= TIP_ANGLE_MAX) {
+                thirdCondition = true; // Mark third condition as complete
+            }
+        }
+
+        if (firstCondition && secondCondition && thirdCondition) {
+            if (lowerArmRotateY < 15) {
+                lowerArmRotateY += 1.0f;
+            }
+        }
+        
+        // Redraw the scene
+        glutPostRedisplay();
+    }
+
     // Call this function again after 16ms (approx. 60fps)
     glutTimerFunc(16, updateAnimation, 0);
 }
@@ -1783,6 +2015,11 @@ int main(int argc, char** argv) {
     pistolBody = loadTexture("pistolsilver.bmp");
     pistolHandle = loadTexture("brownleather.bmp");
     bulletTex = loadTexture("bullet.bmp");
+    steel = loadTexture("steel.bmp");
+    purple= loadTexture("purple.bmp");
+    black = loadTexture("black.bmp");
+    blade = loadTexture("blade.bmp");
+
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
