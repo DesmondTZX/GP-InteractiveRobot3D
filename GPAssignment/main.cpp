@@ -36,6 +36,7 @@ bool isOrtho = false;
 bool coordLines = false;
 bool drawMode = false;
 bool textureView = false;
+bool lightingView = false;
 
 float camX = 0.0f, camY = 0.0f, camZ = 8.0f; // Camera position
 float pitch = 0.0f, yaw = 0.0f;              // Camera rotation (angles in degrees)
@@ -128,6 +129,10 @@ void handleKeys(unsigned char key, int x, int y) {
 
     case 91: // [ key
         drawMode = !drawMode;
+        break;
+
+    case 92: // \ key
+        lightingView = !lightingView;
         break;
 
     case 93: // ] key
@@ -406,29 +411,6 @@ void applyDefaultView() {
     glTranslatef(0.0f, 0.0f, -8.0f); // Default camera position: centered and pulled back slightly
     // No rotation, looking directly at the origin (0, 0, 0)
 }
-
-// void drawInnerHead() {
-//     glPushMatrix();
-//         glTranslatef(.0f, 1.2f, .0f);
-//         glRotatef(90.0f, 1.0f, .0f, .0f);
-//         glRotatef(45.0f, .0f, .0f, 1.0f);
-
-//         // Draw the cylinder
-//         gluCylinder(cyObj, .2, .2, .3, 4, 8);
-
-//         // Draw the bottom cap
-//         glPushMatrix();
-//             glTranslatef(0.0f, 0.0f, 0.0f); // Bottom of the cylinder
-//             gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with bottom radius of .2
-//         glPopMatrix();
-
-//         // Draw the top cap
-//         glPushMatrix();
-//             glTranslatef(0.0f, 0.0f, .3f); // Top of the cylinder
-//             gluDisk(dkObj, 0.0, .2, 4, 1); // Disk with top radius of .2
-//         glPopMatrix();
-//     glPopMatrix();
-// }
 
 void drawOuterHeadFirstLyr() {
     glPushAttrib(GL_CURRENT_BIT);
@@ -833,31 +815,49 @@ void drawOuterChest() {
         glPopMatrix();
     glPopAttrib();
 }
+
 void drawSword2D() {
     glBegin(GL_POLYGON);
     // Blade with gradient
     glColor3f(1.0f, 1.0f, 0.5f); // Gradient start (lighter gold)
+    glBindTexture(GL_TEXTURE_2D, steel);
+
+    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
     glVertex3f(-0.05f, -0.8f, 0.0f); // Bottom left
+    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
     glVertex3f(0.05f, -0.8f, 0.0f);  // Bottom right
     glColor3f(1.0f, 1.0f, 0.0f); // Gradient end (darker gold)
+    glTexCoord2f(0.5f, 1.0f);  // Texture coordinates for sharp tip
     glVertex3f(0.0f, 0.9f, 0.0f);    // Sharp tip
     glEnd();
 
     // Handle
     glBegin(GL_POLYGON);
     glColor3f(0.5f, 0.5f, 0.5f); // Silver color
+    glBindTexture(GL_TEXTURE_2D, pistolHandle);
+
+    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
     glVertex3f(-0.025f, -1.0f, 0.0f); // Bottom left (narrower handle)
+    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
     glVertex3f(0.025f, -1.0f, 0.0f);  // Bottom right (narrower handle)
+    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
     glVertex3f(0.025f, -0.5f, 0.0f);  // Top right
+    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
     glVertex3f(-0.025f, -0.5f, 0.0f); // Top left
     glEnd();
 
     // Crossguard
     glBegin(GL_POLYGON);
     glColor3f(0.8f, 0.8f, 0.0f); // Golden crossguard
+    glBindTexture(GL_TEXTURE_2D, outerbody1);
+
+    glTexCoord2f(0.0f, 0.0f); // Bottom left
     glVertex3f(-0.3f, -0.75f, 0.0f); // Bottom left
+    glTexCoord2f(1.0f, 0.0f); // Bottom right
     glVertex3f(0.3f, -0.75f, 0.0f);  // Bottom right
+    glTexCoord2f(1.0f, 1.0f); // Top right
     glVertex3f(0.2f, -0.7f, 0.0f);   // Top right
+    glTexCoord2f(0.0f, 1.0f); // Top left
     glVertex3f(-0.2f, -0.7f, 0.0f);  // Top left
     glEnd();
 }
@@ -879,50 +879,84 @@ void drawSword3D() {
     // Connect edges for 3D extrusion (blade)
     glBegin(GL_QUADS);
     glColor3f(0.8f, 0.7f, 0.0f); // Side color
+    glBindTexture(GL_TEXTURE_2D, steel);
+
     // Blade sides
+    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
     glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
     glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
     glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
     glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
 
+    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
     glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
     glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
     glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
     glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
 
+    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
     glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
     glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
     glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
     glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
     glEnd();
 
     // Top cap
     glBegin(GL_POLYGON);
     glColor3f(1.0f, 1.0f, 0.0f);
+    glBindTexture(GL_TEXTURE_2D, steel);
+
+    glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f);
     glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.5f, 1.0f);
     glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
     glEnd();
 
     // Bottom cap
     glBegin(GL_POLYGON);
     glColor3f(1.0f, 1.0f, 0.0f);
+    glBindTexture(GL_TEXTURE_2D, steel);
+
+    glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f);
     glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(0.5f, 1.0f);
     glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
     glEnd();
 
     // Handle extrusion
     glBegin(GL_QUADS);
     glColor3f(0.5f, 0.5f, 0.5f);
+    glBindTexture(GL_TEXTURE_2D, pistolHandle);
+
+    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
     glVertex3f(-0.025f, -1.0f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
     glVertex3f(0.025f, -1.0f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
     glVertex3f(0.025f, -1.0f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
     glVertex3f(-0.025f, -1.0f, depthStep * steps / 2.0f);
 
+    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
     glVertex3f(-0.025f, -0.5f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
     glVertex3f(0.025f, -0.5f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
     glVertex3f(0.025f, -0.5f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
     glVertex3f(-0.025f, -0.5f, depthStep * steps / 2.0f);
     glEnd();
 
@@ -2035,7 +2069,7 @@ int main(int argc, char** argv) {
     pistolHandle = loadTexture("brownleather.bmp");
     bulletTex = loadTexture("bullet.bmp");
     steel = loadTexture("steel.bmp");
-    purple= loadTexture("purple.bmp");
+    purple = loadTexture("purple.bmp");
     black = loadTexture("black.bmp");
     blade = loadTexture("blade.bmp");
 
