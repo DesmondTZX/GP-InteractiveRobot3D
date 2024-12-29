@@ -15,6 +15,7 @@
 
 GLUquadricObj* cyObj = NULL;
 GLUquadricObj* dkObj = NULL;
+GLUquadricObj* spObj = NULL;
 
 GLuint innerbody;
 GLuint outerbody1;
@@ -33,6 +34,8 @@ GLuint blade;
 // Camera parameters
 bool cameraView = false;
 bool isOrtho = false;
+
+// other parameters
 bool coordLines = false;
 bool drawMode = false;
 bool textureView = false;
@@ -93,6 +96,11 @@ bool firstCondition = false;
 bool secondCondition = false;
 bool thirdCondition = false;
 
+// lighting params
+GLfloat ambientLight[] = {0.2f, 0.2f, 0.2f, 1.0f}; // RGBA
+GLfloat diffuseLight[] = {0.8f, 0.8f, 0.8f, 1.0f}; // RGBA
+GLfloat specularLight[] = {1.0f, 1.0f, 1.0f, 1.0f}; // RGBA
+GLfloat lightPosition[] = {.0f, 1.0f, .0f, 0.0f}; // Directional light
 
 void handleKeys(unsigned char key, int x, int y) {
     switch (key) {
@@ -130,7 +138,7 @@ void handleKeys(unsigned char key, int x, int y) {
     case 91: // [ key
         drawMode = !drawMode;
         break;
-
+        
     case 92: // \ key
         lightingView = !lightingView;
         break;
@@ -267,20 +275,38 @@ void handleKeys(unsigned char key, int x, int y) {
         if (cameraView) {
             // Movement keys
             switch (key) {
-            case 'w': camY += moveStep; break; // Move camera up
-            case 's': camY -= moveStep; break; // Move camera down
-            case 'a': camX -= moveStep; break; // Move camera left
-            case 'd': camX += moveStep; break; // Move camera right
+                case 'w': camY += moveStep; break; // Move camera up
+                case 's': camY -= moveStep; break; // Move camera down
+                case 'a': camX -= moveStep; break; // Move camera left
+                case 'd': camX += moveStep; break; // Move camera right
 
-            case 45: // minus key (not on numpad)
-                camZ += moveStep;
-                break;
-            case 61: // equal key
-                camZ -= moveStep;
-                break;
-            default: break;
+                case 45: // minus key (not on numpad)
+                    camZ += moveStep;
+                    break;
+                case 61: // equal key
+                    camZ -= moveStep;
+                    break;
+                default: break;
             }
-		}
+		} 
+        
+        if (lightingView) {
+            // Movement keys
+            switch (key) {
+                case 'w': lightPosition[1] += moveStep; break; // Move camera up
+                case 's': lightPosition[1] -= moveStep; break; // Move camera down
+                case 'a': lightPosition[0] -= moveStep; break; // Move camera left
+                case 'd': lightPosition[0] += moveStep; break; // Move camera right
+
+                case 45: // minus key (not on numpad)
+                    lightPosition[2] += moveStep;
+                    break;
+                case 61: // equal key
+                    lightPosition[2] -= moveStep;
+                    break;
+                default: break;
+            }
+        }
         break;
     }
 
@@ -293,6 +319,20 @@ void renderBitmapString(float x, float y, void* font, const std::string& text) {
     for (char c : text) {
         glutBitmapCharacter(font, c);
     }
+}
+
+void setMaterialColor(float r, float g, float b) {
+    // Define the material properties based on the color
+    GLfloat ambient[] = { r * 0.2f, g * 0.2f, b * 0.2f, 1.0f }; // Ambient is 20% of the base color
+    GLfloat diffuse[] = { r, g, b, 1.0f };                      // Diffuse is the base color
+    GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };            // Specular is white
+    GLfloat shininess = 50.0f;                                  // Shininess factor
+
+    // Apply the material properties
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 }
 
 GLuint loadTexture(const char* filename) {
@@ -415,6 +455,7 @@ void applyDefaultView() {
 void drawOuterHeadFirstLyr() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        setMaterialColor(.0f, .0f, 1.0f);
         
         glBindTexture(GL_TEXTURE_2D, outerbody1);
 
@@ -422,49 +463,57 @@ void drawOuterHeadFirstLyr() {
             glTranslatef(.0f, .8f, .0f);
 
             glBegin(GL_QUADS);
-                // front left
+                // Front left
+                glNormal3f(0.0f, 0.0f, -1.0f); // Normal facing towards -Z
                 glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .0f);
                 glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .0f);
                 glTexCoord2f(0.0f, 0.0f); glVertex3f(-.5f, .0f, .0f);
                 glTexCoord2f(0.5f, 0.0f); glVertex3f(.0f, .0f, .0f);
                 
-                // front right
+                // Front right
+                glNormal3f(0.0f, 0.0f, -1.0f); // Normal facing towards -Z
                 glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .0f);
                 glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .0f);
                 glTexCoord2f(1.0f, 0.0f); glVertex3f(.5f, .0f, .0f);
                 glTexCoord2f(0.5f, 0.0f); glVertex3f(.0f, .0f, .0f);
                 
-                // back left
+                // Back left
+                glNormal3f(0.0f, 0.0f, 1.0f); // Normal facing towards +Z
                 glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .5f);
                 glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .5f);
                 glTexCoord2f(0.0f, 0.0f); glVertex3f(-.5f, .0f, .5f);
                 glTexCoord2f(0.5f, 0.0f); glVertex3f(.0f, .0f, .5f);
                 
-                // back right
+                // Back right
+                glNormal3f(0.0f, 0.0f, 1.0f); // Normal facing towards +Z
                 glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .5f);
                 glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .5f);
                 glTexCoord2f(1.0f, 0.0f); glVertex3f(.5f, .0f, .5f);
                 glTexCoord2f(0.5f, 0.0f); glVertex3f(.0f, .0f, .5f);
 
-                // left upper
+                // Left upper
+                glNormal3f(-1.0f, 0.0f, 0.0f); // Normal facing towards -X
                 glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .0f);
                 glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .5f);
                 glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .5f);
                 glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .0f);
 
-                // left lower
+                // Left lower
+                glNormal3f(-1.0f, 0.0f, 0.0f); // Normal facing towards -X
                 glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .0f);
                 glTexCoord2f(0.0f, 0.5f); glVertex3f(-.5f, .5f, .5f);
                 glTexCoord2f(0.0f, 0.0f); glVertex3f(-.5f, .0f, .5f);
                 glTexCoord2f(0.0f, 0.0f); glVertex3f(-.5f, .0f, .0f);
 
-                // right upper
+                // Right upper
+                glNormal3f(1.0f, 0.0f, 0.0f); // Normal facing towards +X
                 glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .0f);
                 glTexCoord2f(0.5f, 1.0f); glVertex3f(.0f, .75f, .5f);
                 glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .5f);
                 glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .0f);
 
-                // right lower
+                // Right lower
+                glNormal3f(1.0f, 0.0f, 0.0f); // Normal facing towards +X
                 glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .0f);
                 glTexCoord2f(1.0f, 0.5f); glVertex3f(.5f, .5f, .5f);
                 glTexCoord2f(1.0f, 0.0f); glVertex3f(.5f, .0f, .5f);
@@ -477,6 +526,7 @@ void drawOuterHeadFirstLyr() {
 void drawEyes() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .0f, .0f);
+        setMaterialColor(1.0f, .0f, .0f);
         glBindTexture(GL_TEXTURE_2D, redbody);
 
         glPushMatrix();
@@ -497,8 +547,9 @@ void drawOuterHeadSecondLyr() {
     // todo: add materials and normals for texturing/coloring
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        setMaterialColor(1.0f, .65f, .0f);
 
-       glBindTexture(GL_TEXTURE_2D, outerbody2);
+        glBindTexture(GL_TEXTURE_2D, outerbody2);
 
         glPushMatrix();
             glTranslatef(.0f, .6f, .0f);
@@ -506,251 +557,203 @@ void drawOuterHeadSecondLyr() {
             glBegin(GL_QUADS);
                 // Upper left cube
 
-                // First face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
-                glVertex3f(0.0f, 1.0f, 0.2f);
-                glTexCoord2f(0.0f, 0.5f);  // texCoord for (0.0f, 1.0f, 0.4f)
-                glVertex3f(0.0f, 1.0f, 0.4f);
-                glTexCoord2f(0.5f, 0.5f);  // texCoord for (-0.5f, 0.75f, 0.4f)
-                glVertex3f(-0.5f, 0.75f, 0.4f);
-                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
-                glVertex3f(-0.5f, 0.75f, 0.2f);
+                // First face (normal points in the positive Y-axis direction)
+                glNormal3f(0.0f, 1.0f, 0.0f); 
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(0.0f, 1.0f, 0.4f);
+                glTexCoord2f(0.5f, 0.5f); glVertex3f(-0.5f, 0.75f, 0.4f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.2f);
 
-                // Second face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
-                glVertex3f(0.0f, 0.95f, 0.2f);
-                glTexCoord2f(0.0f, 0.5f);  // texCoord for (0.0f, 0.95f, 0.4f)
-                glVertex3f(0.0f, 0.95f, 0.4f);
-                glTexCoord2f(0.5f, 0.5f);  // texCoord for (-0.5f, 0.7f, 0.4f)
-                glVertex3f(-0.5f, 0.7f, 0.4f);
-                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.7f, 0.2f)
-                glVertex3f(-0.5f, 0.7f, 0.2f);
+                // Second face (normal direction depends on the face orientation)
+                glNormal3f(0.0f, 0.0f, 1.0f); 
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(0.5f, 0.5f); glVertex3f(-0.5f, 0.7f, 0.4f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(-0.5f, 0.7f, 0.2f);
 
-                // Third face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
-                glVertex3f(0.0f, 1.0f, 0.4f);
-                glTexCoord2f(0.0f, 0.5f);  // texCoord for (0.0f, 0.95f, 0.4f)
-                glVertex3f(0.0f, 0.95f, 0.4f);
-                glTexCoord2f(0.5f, 0.5f);  // texCoord for (-0.5f, 0.7f, 0.4f)
-                glVertex3f(-0.5f, 0.7f, 0.4f);
-                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
-                glVertex3f(-0.5f, 0.75f, 0.4f);
+                // Third face (normal points in the positive Z-axis direction)
+                glNormal3f(0.0f, 0.0f, 1.0f); 
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 1.0f, 0.4f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(0.5f, 0.5f); glVertex3f(-0.5f, 0.7f, 0.4f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.4f);
 
-                // Fourth face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
-                glVertex3f(0.0f, 1.0f, 0.2f);
-                glTexCoord2f(0.0f, 0.5f);  // texCoord for (0.0f, 0.95f, 0.2f)
-                glVertex3f(0.0f, 0.95f, 0.2f);
-                glTexCoord2f(0.5f, 0.5f);  // texCoord for (-0.5f, 0.7f, 0.2f)
-                glVertex3f(-0.5f, 0.7f, 0.2f);
-                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
-                glVertex3f(-0.5f, 0.75f, 0.2f);
+                // Fourth face (normal points in the negative Z-axis direction)
+                glNormal3f(0.0f, 0.0f, -1.0f); 
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(0.0f, 0.5f); glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(0.5f, 0.5f); glVertex3f(-0.5f, 0.7f, 0.2f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.2f);
 
-                // Fifth face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
-                glVertex3f(0.0f, 1.0f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
-                glVertex3f(0.0f, 0.95f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.4f)
-                glVertex3f(0.0f, 0.95f, 0.4f);
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
-                glVertex3f(0.0f, 1.0f, 0.4f);
+                // Fifth face (normal points in the positive X-axis direction)
+                glNormal3f(1.0f, 0.0f, 0.0f); 
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 1.0f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0f, 0.95f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0f, 0.95f, 0.4f);
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 1.0f, 0.4f);
 
-                // Sixth face
-                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
-                glVertex3f(-0.5f, 0.75f, 0.2f);
-                glTexCoord2f(0.5f, 0.0f);  // texCoord for (-0.5f, 0.7f, 0.2f)
-                glVertex3f(-0.5f, 0.7f, 0.2f);
-                glTexCoord2f(0.5f, 0.0f);  // texCoord for (-0.5f, 0.7f, 0.4f)
-                glVertex3f(-0.5f, 0.7f, 0.4f);
-                glTexCoord2f(0.5f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
-                glVertex3f(-0.5f, 0.75f, 0.4f);
+                // Sixth face (normal points in the negative X-axis direction)
+                glNormal3f(-1.0f, 0.0f, 0.0f); 
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.5f, 0.0f); glVertex3f(-0.5f, 0.7f, 0.2f);
+                glTexCoord2f(0.5f, 0.0f); glVertex3f(-0.5f, 0.7f, 0.4f);
+                glTexCoord2f(0.5f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.4f);
 
                 // Lower left cube
 
                 // First face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
-                glVertex3f(-0.5f, 0.75f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.2f)
-                glVertex3f(-0.5f, 0.2f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.4f)
-                glVertex3f(-0.5f, 0.2f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
-                glVertex3f(-0.5f, 0.75f, 0.4f);
+                glNormal3f(0.0f, 0.0f, -1.0f); // Normal pointing along the negative Z-axis
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.2f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.4f);
 
                 // Second face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.2f)
-                glVertex3f(-0.55f, 0.75f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.2f)
-                glVertex3f(-0.55f, 0.2f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.4f)
-                glVertex3f(-0.55f, 0.2f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.4f)
-                glVertex3f(-0.55f, 0.75f, 0.4f);
+                glNormal3f(-1.0f, 0.0f, 0.0f); // Normal pointing along the negative X-axis
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.55f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.55f, 0.2f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.55f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.55f, 0.75f, 0.4f);
 
                 // Third face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.2f)
-                glVertex3f(-0.55f, 0.75f, 0.2f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
-                glVertex3f(-0.5f, 0.75f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.2f)
-                glVertex3f(-0.5f, 0.2f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.2f)
-                glVertex3f(-0.55f, 0.2f, 0.2f);
+                glNormal3f(0.0f, 1.0f, 0.0f); // Normal pointing along the positive Y-axis
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.55f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.2f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.55f, 0.2f, 0.2f);
 
                 // Fourth face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.4f)
-                glVertex3f(-0.55f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
-                glVertex3f(-0.5f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.4f)
-                glVertex3f(-0.5f, 0.2f, 0.4f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.4f)
-                glVertex3f(-0.55f, 0.2f, 0.4f);
+                glNormal3f(0.0f, -1.0f, 0.0f); // Normal pointing along the negative Y-axis
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.55f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.2f, 0.4f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.55f, 0.2f, 0.4f);
 
                 // Fifth face (top face)
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.75f, 0.4f)
-                glVertex3f(-0.55f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.75f, 0.4f)
-                glVertex3f(-0.5f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.75f, 0.2f)
-                glVertex3f(-0.5f, 0.75f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.75f, 0.2f)
-                glVertex3f(-0.55f, 0.75f, 0.2f);
+                glNormal3f(0.0f, 0.0f, 1.0f); // Normal pointing along the positive Z-axis
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.55f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.55f, 0.75f, 0.2f);
 
                 // Sixth face (bottom face)
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (-0.55f, 0.2f, 0.4f)
-                glVertex3f(-0.55f, 0.2f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (-0.5f, 0.2f, 0.4f)
-                glVertex3f(-0.5f, 0.2f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (-0.5f, 0.2f, 0.2f)
-                glVertex3f(-0.5f, 0.2f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (-0.55f, 0.2f, 0.2f)
-                glVertex3f(-0.55f, 0.2f, 0.2f);
+                glNormal3f(0.0f, 0.0f, -1.0f); // Normal pointing along the negative Z-axis
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.55f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, 0.2f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.55f, 0.2f, 0.2f);
 
                 // Upper right cube
 
-                // First face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                // First face (front)
+                glNormal3f(0.0f, 0.0f, -1.0f);  // Normal facing outward
+                glTexCoord2f(0.0f, 1.0f);
                 glVertex3f(0.0f, 1.0f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                glTexCoord2f(0.0f, 0.0f);
                 glVertex3f(0.0f, 1.0f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glTexCoord2f(1.0f, 0.0f);
                 glVertex3f(0.5f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                glTexCoord2f(1.0f, 1.0f);
                 glVertex3f(0.5f, 0.75f, 0.2f);
 
-                // Second face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                // Second face (back)
+                glNormal3f(0.0f, 0.0f, 1.0f);
+                glTexCoord2f(0.0f, 1.0f);
                 glVertex3f(0.0f, 0.95f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glTexCoord2f(0.0f, 0.0f);
                 glVertex3f(0.0f, 0.95f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.7f, 0.4f)
+                glTexCoord2f(1.0f, 0.0f);
                 glVertex3f(0.5f, 0.7f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.7f, 0.2f)
+                glTexCoord2f(1.0f, 1.0f);
                 glVertex3f(0.5f, 0.7f, 0.2f);
 
-                // Third face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                // Third face (right)
+                glNormal3f(1.0f, 0.0f, 0.0f);
+                glTexCoord2f(0.0f, 1.0f);
                 glVertex3f(0.0f, 1.0f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glTexCoord2f(1.0f, 1.0f);
                 glVertex3f(0.0f, 0.95f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.7f, 0.4f)
+                glTexCoord2f(1.0f, 0.0f);
                 glVertex3f(0.5f, 0.7f, 0.4f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glTexCoord2f(0.0f, 0.0f);
                 glVertex3f(0.5f, 0.75f, 0.4f);
 
-                // Fourth face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                // Fourth face (left)
+                glNormal3f(-1.0f, 0.0f, 0.0f);
+                glTexCoord2f(0.0f, 1.0f);
                 glVertex3f(0.0f, 1.0f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                glTexCoord2f(0.0f, 0.0f);
                 glVertex3f(0.0f, 0.95f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.7f, 0.2f)
+                glTexCoord2f(1.0f, 0.0f);
                 glVertex3f(0.5f, 0.7f, 0.2f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                glTexCoord2f(1.0f, 1.0f);
                 glVertex3f(0.5f, 0.75f, 0.2f);
 
-                // Fifth face (top face)
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.0f, 1.0f, 0.2f)
+                // Fifth face (top)
+                glNormal3f(0.0f, 1.0f, 0.0f);
+                glTexCoord2f(0.0f, 1.0f);
                 glVertex3f(0.0f, 1.0f, 0.2f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.0f, 0.95f, 0.2f)
+                glTexCoord2f(1.0f, 1.0f);
                 glVertex3f(0.0f, 0.95f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.0f, 0.95f, 0.4f)
+                glTexCoord2f(1.0f, 0.0f);
                 glVertex3f(0.0f, 0.95f, 0.4f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.0f, 1.0f, 0.4f)
+                glTexCoord2f(0.0f, 0.0f);
                 glVertex3f(0.0f, 1.0f, 0.4f);
 
-                // Sixth face (bottom face)
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
+                // Sixth face (bottom)
+                glNormal3f(0.0f, -1.0f, 0.0f);
+                glTexCoord2f(0.0f, 1.0f);
                 glVertex3f(0.5f, 0.75f, 0.2f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.7f, 0.2f)
+                glTexCoord2f(1.0f, 1.0f);
                 glVertex3f(0.5f, 0.7f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.7f, 0.4f)
+                glTexCoord2f(1.0f, 0.0f);
                 glVertex3f(0.5f, 0.7f, 0.4f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
+                glTexCoord2f(0.0f, 0.0f);
                 glVertex3f(0.5f, 0.75f, 0.4f);
 
                 // Lower right cube
 
-                // First face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
-                glVertex3f(0.5f, 0.75f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.2f)
-                glVertex3f(0.5f, 0.2f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.4f)
-                glVertex3f(0.5f, 0.2f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
-                glVertex3f(0.5f, 0.75f, 0.4f);
+                // First face (front)
+                glNormal3f(0.0f, 0.0f, 1.0f); // Normal pointing forward
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0.5f, 0.2f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 0.75f, 0.4f);
 
-                // Second face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.2f)
-                glVertex3f(0.55f, 0.75f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.2f)
-                glVertex3f(0.55f, 0.2f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.4f)
-                glVertex3f(0.55f, 0.2f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.4f)
-                glVertex3f(0.55f, 0.75f, 0.4f);
+                // Second face (back)
+                glNormal3f(0.0f, 0.0f, -1.0f); // Normal pointing backward
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.55f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0.55f, 0.2f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(0.55f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0.55f, 0.75f, 0.4f);
 
-                // Third face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.2f)
-                glVertex3f(0.55f, 0.75f, 0.2f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
-                glVertex3f(0.5f, 0.75f, 0.2f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.2f)
-                glVertex3f(0.5f, 0.2f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.2f)
-                glVertex3f(0.55f, 0.2f, 0.2f);
+                // Third face (left)
+                glNormal3f(-1.0f, 0.0f, 0.0f); // Normal pointing left
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.55f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 0.75f, 0.2f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.2f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0.55f, 0.2f, 0.2f);
 
-                // Fourth face
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.4f)
-                glVertex3f(0.55f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
-                glVertex3f(0.5f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.4f)
-                glVertex3f(0.5f, 0.2f, 0.4f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.4f)
-                glVertex3f(0.55f, 0.2f, 0.4f);
+                // Fourth face (right)
+                glNormal3f(1.0f, 0.0f, 0.0f); // Normal pointing right
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.55f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.2f, 0.4f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0.55f, 0.2f, 0.4f);
 
-                // Fifth face (top face)
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.75f, 0.4f)
-                glVertex3f(0.55f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.75f, 0.4f)
-                glVertex3f(0.5f, 0.75f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.75f, 0.2f)
-                glVertex3f(0.5f, 0.75f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.75f, 0.2f)
-                glVertex3f(0.55f, 0.75f, 0.2f);
+                // Fifth face (top)
+                glNormal3f(0.0f, 1.0f, 0.0f); // Normal pointing up
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.55f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 0.75f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.75f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0.55f, 0.75f, 0.2f);
 
-                // Sixth face (bottom face)
-                glTexCoord2f(0.0f, 1.0f);  // texCoord for (0.55f, 0.2f, 0.4f)
-                glVertex3f(0.55f, 0.2f, 0.4f);
-                glTexCoord2f(1.0f, 1.0f);  // texCoord for (0.5f, 0.2f, 0.4f)
-                glVertex3f(0.5f, 0.2f, 0.4f);
-                glTexCoord2f(1.0f, 0.0f);  // texCoord for (0.5f, 0.2f, 0.2f)
-                glVertex3f(0.5f, 0.2f, 0.2f);
-                glTexCoord2f(0.0f, 0.0f);  // texCoord for (0.55f, 0.2f, 0.2f)
-                glVertex3f(0.55f, 0.2f, 0.2f);
+                // Sixth face (bottom)
+                glNormal3f(0.0f, -1.0f, 0.0f); // Normal pointing down
+                glTexCoord2f(0.0f, 1.0f); glVertex3f(0.55f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 0.2f, 0.4f);
+                glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 0.2f, 0.2f);
+                glTexCoord2f(0.0f, 0.0f); glVertex3f(0.55f, 0.2f, 0.2f);
             glEnd();
         glPopMatrix();
     glPopAttrib();
@@ -760,6 +763,7 @@ void drawInnerChest() {
     glPushAttrib(GL_CURRENT_BIT);
         glPushMatrix();
             glColor3f(.18f, .24f, .29f);
+            setMaterialColor(.18f, .24f, .29f);
             glBindTexture(GL_TEXTURE_2D, innerbody);
 
             glTranslatef(.0f, .56f, .0f);
@@ -788,6 +792,7 @@ void drawOuterChest() {
     // outer chest front (orange)
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        setMaterialColor(1.0f, .65f, .0f);
         glBindTexture(GL_TEXTURE_2D, outerbody2);
     
         glPushMatrix();
@@ -803,6 +808,7 @@ void drawOuterChest() {
     // outer chest front (blue)
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        setMaterialColor(.0f, .0f, 1.0f);
         glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         glPushMatrix();
@@ -817,9 +823,11 @@ void drawOuterChest() {
 }
 
 void drawSword2D() {
-    glBegin(GL_POLYGON);
     // Blade with gradient
+    glBegin(GL_POLYGON);
+    glNormal3f(0.0f, 0.0f, 1.0f); // Normal pointing out of the screen (positive Z-axis)
     glColor3f(1.0f, 1.0f, 0.5f); // Gradient start (lighter gold)
+    setMaterialColor(1.0f, 1.0f, 0.5f); // Gradient start (lighter gold)
     glBindTexture(GL_TEXTURE_2D, steel);
 
     glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
@@ -833,7 +841,9 @@ void drawSword2D() {
 
     // Handle
     glBegin(GL_POLYGON);
+    glNormal3f(0.0f, 0.0f, 1.0f); // Normal pointing out of the screen (positive Z-axis)
     glColor3f(0.5f, 0.5f, 0.5f); // Silver color
+    setMaterialColor(0.5f, 0.5f, 0.5f); // Silver color
     glBindTexture(GL_TEXTURE_2D, pistolHandle);
 
     glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
@@ -848,7 +858,9 @@ void drawSword2D() {
 
     // Crossguard
     glBegin(GL_POLYGON);
+    glNormal3f(0.0f, 0.0f, 1.0f); // Normal pointing out of the screen (positive Z-axis)
     glColor3f(0.8f, 0.8f, 0.0f); // Golden crossguard
+    setMaterialColor(0.8f, 0.8f, 0.0f); // Golden crossguard
     glBindTexture(GL_TEXTURE_2D, outerbody1);
 
     glTexCoord2f(0.0f, 0.0f); // Bottom left
@@ -872,92 +884,73 @@ void drawSword3D() {
         float z = depthStep * (i - steps / 2.0f);
         glPushMatrix();
         glTranslatef(0.0f, 0.0f, z);
-        drawSword2D();
+        drawSword2D(); // Assumes drawSword2D uses normals (e.g., facing +Z or -Z)
         glPopMatrix();
     }
 
     // Connect edges for 3D extrusion (blade)
     glBegin(GL_QUADS);
     glColor3f(0.8f, 0.7f, 0.0f); // Side color
+    setMaterialColor(0.8f, 0.7f, 0.0f); // Side color
     glBindTexture(GL_TEXTURE_2D, steel);
 
-    // Blade sides
-    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
-    glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
-    glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
-    glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
-    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
-    glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
+    // Blade sides (Assign normals based on direction)
+    glNormal3f(0.0f, -1.0f, 0.0f); // Normal for the bottom edge
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
 
-    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
-    glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
-    glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
-    glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
-    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
-    glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
+    glNormal3f(-1.0f, 0.0f, 0.0f); // Normal for the left edge
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
 
-    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
-    glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
-    glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
-    glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
-    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
-    glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
+    glNormal3f(1.0f, 0.0f, 0.0f); // Normal for the right edge
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
     glEnd();
 
     // Top cap
     glBegin(GL_POLYGON);
+    glNormal3f(0.0f, 0.0f, 1.0f); // Normal pointing outward (+Z)
     glColor3f(1.0f, 1.0f, 0.0f);
+    setMaterialColor(1.0f, 1.0f, 0.0f);
     glBindTexture(GL_TEXTURE_2D, steel);
 
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
-    glTexCoord2f(0.5f, 1.0f);
-    glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.05f, -0.8f, depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.05f, -0.8f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.5f, 1.0f); glVertex3f(0.0f, 0.9f, depthStep * steps / 2.0f);
     glEnd();
 
     // Bottom cap
     glBegin(GL_POLYGON);
+    glNormal3f(0.0f, 0.0f, -1.0f); // Normal pointing inward (-Z)
     glColor3f(1.0f, 1.0f, 0.0f);
+    setMaterialColor(1.0f, 1.0f, 0.0f);
     glBindTexture(GL_TEXTURE_2D, steel);
 
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
-    glTexCoord2f(0.5f, 1.0f);
-    glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.05f, -0.8f, -depthStep * steps / 2.0f);
+    glTexCoord2f(0.5f, 1.0f); glVertex3f(0.0f, 0.9f, -depthStep * steps / 2.0f);
     glEnd();
 
     // Handle extrusion
     glBegin(GL_QUADS);
     glColor3f(0.5f, 0.5f, 0.5f);
+    setMaterialColor(0.5f, 0.5f, 0.5f);
     glBindTexture(GL_TEXTURE_2D, pistolHandle);
 
-    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
-    glVertex3f(-0.025f, -1.0f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
-    glVertex3f(0.025f, -1.0f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
-    glVertex3f(0.025f, -1.0f, depthStep * steps / 2.0f);
-    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
-    glVertex3f(-0.025f, -1.0f, depthStep * steps / 2.0f);
+    glNormal3f(0.0f, -1.0f, 0.0f); // Normal for front face of the handle
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.025f, -1.0f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.025f, -1.0f, -depthStep * steps / 2.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.025f, -1.0f, depthStep * steps / 2.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.025f, -1.0f, depthStep * steps / 2.0f);
 
-    glTexCoord2f(0.0f, 0.0f);  // Texture coordinates for bottom left
-    glVertex3f(-0.025f, -0.5f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 0.0f);  // Texture coordinates for bottom right
-    glVertex3f(0.025f, -0.5f, -depthStep * steps / 2.0f);
-    glTexCoord2f(1.0f, 1.0f);  // Texture coordinates for top right
-    glVertex3f(0.025f, -0.5f, depthStep * steps / 2.0f);
-    glTexCoord2f(0.0f, 1.0f);  // Texture coordinates for top left
-    glVertex3f(-0.025f, -0.5f, depthStep * steps / 2.0f);
+    // Add normals for other faces as needed...
     glEnd();
 
     glPopMatrix();
@@ -985,6 +978,8 @@ void sickleCorn(double tr, double br, double h) {
 void sickleBlade(float sz, float sh) {
     glBegin(GL_QUADS);
 
+    // Front face
+    glNormal3f(0.0, 0.0, 1.0); // Normal pointing out of the screen
     glTexCoord2f(0.0, 1.0);
     glVertex3f(0.0, 0.0, sh);
     glTexCoord2f(1.0, 1.0);
@@ -994,6 +989,8 @@ void sickleBlade(float sz, float sh) {
     glTexCoord2f(0.0, 0.0);
     glVertex3f(0.0, 0.0, 0.0);
 
+    // Side face 1
+    glNormal3f(-sz, 0.0, -sh / 2); // Approximate normal for this face
     glTexCoord2f(0.0, 1.0);
     glVertex3f(0.15 / 2, sz, sh / 2);
     glTexCoord2f(1.0, 1.0);
@@ -1003,6 +1000,8 @@ void sickleBlade(float sz, float sh) {
     glTexCoord2f(0.0, 0.0);
     glVertex3f(0.15 / 2, sz, sh / 2);
 
+    // Side face 2
+    glNormal3f(0.0, sz, 0.0); // Normal pointing upwards
     glTexCoord2f(0.0, 1.0);
     glVertex3f(0.15 / 2, sz, sh / 2);
     glTexCoord2f(1.0, 1.0);
@@ -1012,6 +1011,8 @@ void sickleBlade(float sz, float sh) {
     glTexCoord2f(0.0, 0.0);
     glVertex3f(0.15 / 2, sz, sh / 2);
 
+    // Side face 3
+    glNormal3f(sz, 0.0, sh / 2); // Approximate normal for this face
     glTexCoord2f(0.0, 1.0);
     glVertex3f(0.15 / 2, sz, sh / 2);
     glTexCoord2f(1.0, 1.0);
@@ -1021,6 +1022,8 @@ void sickleBlade(float sz, float sh) {
     glTexCoord2f(0.0, 0.0);
     glVertex3f(0.15 / 2, sz, sh / 2);
 
+    // Side face 4
+    glNormal3f(0.0, sz, -sh / 2); // Approximate normal for this face
     glTexCoord2f(0.0, 1.0);
     glVertex3f(0.15 / 2, sz, sh / 2);
     glTexCoord2f(1.0, 1.0);
@@ -1029,6 +1032,7 @@ void sickleBlade(float sz, float sh) {
     glVertex3f(0.0, 0.0, sh);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(0.15 / 2, sz, sh / 2);
+
     glEnd();
 }
 
@@ -1037,12 +1041,14 @@ void sickle() {
     glBindTexture(GL_TEXTURE_2D, steel);
     glRotatef(90, 1.0, 0.0, 0.0);
     glColor3f(0.75, 0.76, 0.8);
+    setMaterialColor(0.75, 0.76, 0.8);
     sickleStick(0.015, 0.015, 0.7);
     glPopMatrix();
 
     glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, purple);
     glColor3f(0.44, 0.44, 0.43);
+    setMaterialColor(0.44, 0.44, 0.43);
     glTranslatef(0.0, -0.7, 0.0);
     sickleCorn(0.03, 0.0, 0.15);
     glPopMatrix();
@@ -1052,12 +1058,14 @@ void sickle() {
     glTranslatef(0.0, 0.2, 0.0);
     glRotatef(90, 1.0, 0.0, 0.0);
     glColor3f(0.44, 0.44, 0.43);
+    setMaterialColor(0.44, 0.44, 0.43);
     sickleStick(0.02, 0.02, 0.2);
     glPopMatrix();
 
     glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, purple);
     glColor3f(0.44, 0.44, 0.43);
+    setMaterialColor(0.44, 0.44, 0.43);
     glTranslatef(0.0, 0.2, 0.0);
     glRotatef(180, 1.0, 0.0, 0.0);
     sickleCorn(0.03, 0.0, 0.15);
@@ -1066,6 +1074,7 @@ void sickle() {
     glPushMatrix();
     glBindTexture(GL_TEXTURE_2D, blade);
     glColor3f(0.85, 0.85, 0.85);
+    setMaterialColor(0.85, 0.85, 0.85);
     glTranslatef(0.0, 0.2, 0.0);
     glRotatef(-90, 0.0, 0.0, 1.0);
     sickleBlade(0.6, 0.01);
@@ -1105,6 +1114,7 @@ void drawLeftArm() {
 
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        setMaterialColor(1.0f, .65f, .0f);
         glBindTexture(GL_TEXTURE_2D, outerbody2);
 
         gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
@@ -1119,6 +1129,7 @@ void drawLeftArm() {
 
         glPushAttrib(GL_CURRENT_BIT);
             glColor3f(1.0f, .65f, .0f);
+            setMaterialColor(1.0f, .65f, .0f);
             glBindTexture(GL_TEXTURE_2D, outerbody2);
 
             gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
@@ -1129,6 +1140,7 @@ void drawLeftArm() {
             glTranslatef(0.0f, 0.0f, 0.6f);
             
                 glColor3f(1.0f, .65f, .0f);
+                setMaterialColor(1.0f, .65f, .0f);
 
                 gluCylinder(cyObj, 0.2, 0.2, 0.2, 4, 8);
 
@@ -1140,6 +1152,7 @@ void drawLeftArm() {
                 // Thumb
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1153,6 +1166,7 @@ void drawLeftArm() {
                 // Index finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1165,6 +1179,7 @@ void drawLeftArm() {
                 // Middle finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1177,6 +1192,7 @@ void drawLeftArm() {
                 // Ring finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1189,6 +1205,7 @@ void drawLeftArm() {
                 // Little finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
                 
                     glPushMatrix();
@@ -1233,6 +1250,7 @@ void drawRightArm() {
 
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        setMaterialColor(.0f, .0f, 1.0f);
         glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
@@ -1247,6 +1265,7 @@ void drawRightArm() {
 
         glPushAttrib(GL_CURRENT_BIT);
             glColor3f(.0f, .0f, 1.0f);
+            setMaterialColor(.0f, .0f, 1.0f);
             glBindTexture(GL_TEXTURE_2D, outerbody1);
 
             gluCylinder(cyObj, 0.2, 0.2, 0.6, 4, 8);
@@ -1258,6 +1277,7 @@ void drawRightArm() {
             
             glPushAttrib(GL_CURRENT_BIT);
                 glColor3f(.0f, .0f, 1.0f);
+                setMaterialColor(.0f, .0f, 1.0f);
                 glBindTexture(GL_TEXTURE_2D, outerbody1);
 
                 gluCylinder(cyObj, 0.2, 0.2, 0.2, 4, 8);
@@ -1271,6 +1291,7 @@ void drawRightArm() {
                 // Thumb
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1284,6 +1305,7 @@ void drawRightArm() {
                 // Index finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1296,6 +1318,7 @@ void drawRightArm() {
                 // Middle finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1308,6 +1331,7 @@ void drawRightArm() {
                 // Ring finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1320,6 +1344,7 @@ void drawRightArm() {
                 // Little finger
                 glPushAttrib(GL_CURRENT_BIT);
                     glColor3f(.18f, .24f, .29f);
+                    setMaterialColor(.18f, .24f, .29f);
                     glBindTexture(GL_TEXTURE_2D, innerbody);
 
                     glPushMatrix();
@@ -1457,6 +1482,7 @@ void pistol() {
     glBindTexture(GL_TEXTURE_2D, pistolBody);
     // textureArr[0] = loadTexture2("pistolsilver.bmp");
     glColor3f(0.83, 0.83, 0.83);
+    setMaterialColor(0.83, 0.83, 0.83);
     pistolCube(0.35, 0.1, 0.1);
     // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
@@ -1473,6 +1499,7 @@ void pistol() {
     glTranslatef(0.05, 0.01, 0.05);
     glRotatef(110, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
+    setMaterialColor(0.64, 0.66, 0.69);
     pistolCube(0.2, 0.08, 0.08);
     // glDeleteTextures(1, &pistolHandle);
     glPopMatrix();
@@ -1481,6 +1508,7 @@ void pistol() {
     glTranslatef(0.05, 0.01, 0.05);
     glRotatef(110, 0.0, 1.0, 0.0);
     glColor3f(0.0, 0.0, 0.0);
+    setMaterialColor(0.0, 0.0, 0.0);
     pistolLine(0.2, 0.08, 0.08);
     glPopMatrix();
 
@@ -1491,6 +1519,7 @@ void pistol() {
     glTranslatef(0.3, 0.04, 0.01);
     glRotatef(270, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
+    setMaterialColor(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.03, 0.03);
     // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
@@ -1499,6 +1528,7 @@ void pistol() {
     glTranslatef(0.3, 0.04, 0.01);
     glRotatef(270, 0.0, 1.0, 0.0);
     glColor3f(0.0, 0.0, 0.0);
+    setMaterialColor(0.0, 0.0, 0.0);
     pistolLine(0.12, 0.03, 0.03);
     glPopMatrix();
 
@@ -1516,6 +1546,7 @@ void pistol() {
     glTranslatef(0.2, 0.03, -0.05);
     glRotatef(270, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
+    setMaterialColor(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.04, 0.02);
     // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
@@ -1524,6 +1555,7 @@ void pistol() {
     glTranslatef(0.2, 0.03, -0.05);
     glRotatef(270, 0.0, 1.0, 0.0);
     glColor3f(0.0, 0.0, 0.0);
+    setMaterialColor(0.0, 0.0, 0.0);
     pistolLine(0.12, 0.04, 0.02);
     glPopMatrix();
 
@@ -1534,6 +1566,7 @@ void pistol() {
     glTranslatef(0.2, 0.03, -0.05);
     glRotatef(180, 0.0, 1.0, 0.0);
     glColor3f(0.64, 0.66, 0.69);
+    setMaterialColor(0.64, 0.66, 0.69);
     pistolCube(0.12, 0.04, 0.02);
     // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
@@ -1542,6 +1575,7 @@ void pistol() {
     glTranslatef(0.2, 0.03, -0.05);
     glRotatef(180, 0.0, 1.0, 0.0);
     glColor3f(0.0, 0.0, 0.0);
+    setMaterialColor(0.0, 0.0, 0.0);
     pistolLine(0.12, 0.04, 0.02);
     glPopMatrix();
 
@@ -1552,6 +1586,7 @@ void pistol() {
     glTranslatef(0.16, 0.043, -0.025);
     glRotatef(230, 0.0, 1.0, 0.0);
     glColor3f(0.85, 0.85, 0.85);
+    setMaterialColor(0.85, 0.85, 0.85);
     pistolCube(0.08, 0.02, 0.02);
     // glDeleteTextures(1, &pistolBody);
     glPopMatrix();
@@ -1560,6 +1595,7 @@ void pistol() {
     glTranslatef(0.16, 0.043, -0.025);
     glRotatef(230, 0.0, 1.0, 0.0);
     glColor3f(0.0, 0.0, 0.0);
+    setMaterialColor(0.0, 0.0, 0.0);
     pistolLine(0.08, 0.02, 0.02);
     glPopMatrix();
 }
@@ -1581,6 +1617,7 @@ void bulletShoot() {
     glBindTexture(GL_TEXTURE_2D, bulletTex);
     glTranslatef(0.3, 0.05, 0.05);
     glColor3f(1.0, 1.0, 1.0);
+    setMaterialColor(1.0, 1.0, 1.0);
     bullet();
     // glDeleteTextures(1, &bulletTex);
     glPopMatrix();
@@ -1598,19 +1635,17 @@ void shootingPistol() {
 }
 
 void drawLightSrcSphere() {
-    // comment this out for now, use this when light source is added
-    /*
     glPushMatrix();
-	glTranslatef(light_diffposition[0], light_diffposition[1], light_diffposition[2]);
+	glTranslatef(lightPosition[0], lightPosition[1], lightPosition[2]);
         glColor3f(1.0f, .0f, .0f);
-        gluSphere(sphere, .05, 50, 25);
-	glPopMatrix();
-    */
+        gluSphere(spObj, .05, 50, 25);
+	glPopMatrix(); 
 }
 
 void drawLeftLeg() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        setMaterialColor(1.0f, .65f, .0f);
         glBindTexture(GL_TEXTURE_2D, outerbody2);
 
         // Draw the cylinder
@@ -1633,6 +1668,7 @@ void drawLeftLeg() {
 void drawRightLeg() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        setMaterialColor(.0f, .0f, 1.0f);
         glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         // Draw the cylinder
@@ -1655,6 +1691,7 @@ void drawRightLeg() {
 void drawInnerTorso() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.18f, .24f, .29f);
+        setMaterialColor(.18f, .24f, .29f);
         glBindTexture(GL_TEXTURE_2D, innerbody);
 
         glPushMatrix();
@@ -1680,7 +1717,6 @@ void drawInnerTorso() {
     glPopAttrib();
 }
 
-// Function to draw a 3D prism with texture coordinates
 void drawPrism(float x, float y, float z, int numSides, float height, float scale, float rotX, float rotY, float rotZ) {
     if (numSides < 3) {
         printf("Prism must have at least 3 sides.\n");
@@ -1698,6 +1734,7 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
 
     // Draw the bottom face
     glBegin(GL_POLYGON);
+    glNormal3f(0.0f, -1.0f, 0.0f); // Normal pointing downwards
     for (int i = 0; i < numSides; ++i) {
         float angle = i * angleStep;
         float xPos = cos(angle);
@@ -1711,6 +1748,7 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
 
     // Draw the top face
     glBegin(GL_POLYGON);
+    glNormal3f(0.0f, 1.0f, 0.0f); // Normal pointing upwards
     for (int i = 0; i < numSides; ++i) {
         float angle = i * angleStep;
         float xPos = cos(angle);
@@ -1731,11 +1769,24 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
         float x1 = cos(angle1), z1 = sin(angle1);
         float x2 = cos(angle2), z2 = sin(angle2);
 
+        // Calculate normal for the side face (cross product of two vectors on the face)
+        float normalX = z1 - z2;
+        float normalZ = x2 - x1;
+        float normalY = 0.0f; // All side faces are parallel to the ground, so normal is in the Y-axis.
+
+        // Normalize the normal
+        float length = sqrt(normalX * normalX + normalZ * normalZ);
+        normalX /= length;
+        normalZ /= length;
+
         // Map texture coordinates
         float s1 = (float)i / numSides;          // Horizontal mapping for current side
         float s2 = (float)(i + 1) / numSides;    // Horizontal mapping for next side
         float tBottom = 0.0f;                    // Bottom texture coordinate
         float tTop = 1.0f;                       // Top texture coordinate
+
+        // Set the normal for the side face
+        glNormal3f(normalX, normalY, normalZ);
 
         // Four vertices of the quad
         glTexCoord2f(s1, tBottom); glVertex3f(x1, 0.0f, z1); // Bottom-left
@@ -1751,6 +1802,7 @@ void drawPrism(float x, float y, float z, int numSides, float height, float scal
 void drawOuterTorso() {
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .65f, .0f);
+        setMaterialColor(1.0f, .65f, .0f);
         glBindTexture(GL_TEXTURE_2D, outerbody2);
 
         drawPrism(-.28f, .0f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
@@ -1759,6 +1811,7 @@ void drawOuterTorso() {
     
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(.0f, .0f, 1.0f);
+        setMaterialColor(.0f, .0f, 1.0f);
         glBindTexture(GL_TEXTURE_2D, outerbody1);
 
         drawPrism(-.32f, .3f, .0f, 6, .8f, .15f, .0f, .0f, 97.0f);
@@ -1767,6 +1820,7 @@ void drawOuterTorso() {
 
     glPushAttrib(GL_CURRENT_BIT);
         glColor3f(1.0f, .0f, .0f);
+        setMaterialColor(1.0f, .0f, .0f);
         glBindTexture(GL_TEXTURE_2D, redbody);
 
         drawPrism(.0f, .13f, -.48f, 3, .5f, .35f, 83.0f, 26.0f, .0f);
@@ -1781,19 +1835,37 @@ void display() {
 
     cyObj = gluNewQuadric();
     dkObj = gluNewQuadric();
+    spObj = gluNewQuadric();
+
+    // Ambient light (soft background light)
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+
+    // Diffuse light (directional light for shading)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+
+    // Specular light (shiny highlights)
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+
+    // Light position
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
     if (cameraView) {
         applyCameraTransformations(); // Use interactive camera
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
         renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_HELVETICA_18, "Camera Movement: ON");
     } else {
         applyDefaultView(); // Use fixed default view
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
         renderBitmapString(-2.0f, 1.8f, GLUT_BITMAP_HELVETICA_18, "Camera Movement: OFF");
     }
 
     if (coordLines) {
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
         renderBitmapString(-2.0f, 1.65f, GLUT_BITMAP_HELVETICA_18, "Coordinate Lines: ON");
 
         glBegin(GL_LINES);
@@ -1805,34 +1877,64 @@ void display() {
         glEnd();
     } else {
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
         renderBitmapString(-2.0f, 1.65f, GLUT_BITMAP_HELVETICA_18, "Coordinate Lines: OFF");
     }
 
     if (isOrtho) {
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
         renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Orthogonal View");
     } else {
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
         renderBitmapString(-2.0f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Viewport: Perspective View");
     }
 
     if (drawMode) {
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
         renderBitmapString(-2.0f, 1.35f, GLUT_BITMAP_HELVETICA_18, "Draw Mode: Line");
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     } else {
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
         renderBitmapString(-2.0f, 1.35f, GLUT_BITMAP_HELVETICA_18, "Draw Mode: Fill");
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
+    if (lightingView) {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
+        renderBitmapString(-2.0f, 1.2f, GLUT_BITMAP_HELVETICA_18, "Lighting Mode: ON");
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+    } else {
+        glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
+        renderBitmapString(-2.0f, 1.2f, GLUT_BITMAP_HELVETICA_18, "Lighting Mode: OFF");
+        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHT0);
+    }
+
     if (textureView) {
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
-        renderBitmapString(-2.0f, 1.15f, GLUT_BITMAP_HELVETICA_18, "Texture Mode: ON");
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
+        renderBitmapString(-2.0f, 1.05f, GLUT_BITMAP_HELVETICA_18, "Texture Mode: ON");
         glEnable(GL_TEXTURE_2D);
     } else {
         glDisable(GL_TEXTURE_2D); // Ensure text rendering is unaffected by textures
-        renderBitmapString(-2.0f, 1.15f, GLUT_BITMAP_HELVETICA_18, "Texture Mode: OFF");
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setMaterialColor(1.0f, 1.0f, 1.0f);
+        renderBitmapString(-2.0f, 1.05f, GLUT_BITMAP_HELVETICA_18, "Texture Mode: OFF");
         glDisable(GL_TEXTURE_2D);
     }
 
@@ -1843,6 +1945,11 @@ void display() {
     gluQuadricTexture(dkObj, GL_TRUE);
     gluQuadricNormals(dkObj, GLU_SMOOTH);
     
+    gluQuadricTexture(spObj, GL_TRUE);
+    gluQuadricNormals(spObj, GLU_SMOOTH);
+
+    drawLightSrcSphere();
+    
     if (isGun) {
         glPushMatrix();
             // glEnable(GL_TEXTURE_2D);
@@ -1852,7 +1959,6 @@ void display() {
             // glDisable(GL_TEXTURE_2D);
         glPopMatrix();
     }
-    
     
     glPushMatrix();
         glTranslatef(-.3f, -.201f, .0f);
@@ -2058,7 +2164,6 @@ int main(int argc, char** argv) {
     glutCreateWindow("BACS2173 - Assignment");          // Create window with title
 
 	glEnable(GL_DEPTH_TEST); // Enable depth testing
-    // glEnable(GL_LIGHTING);
 
     innerbody = loadTexture("steel.bmp");
     outerbody1 = loadTexture("bluemetal.bmp");
@@ -2072,7 +2177,6 @@ int main(int argc, char** argv) {
     purple = loadTexture("purple.bmp");
     black = loadTexture("black.bmp");
     blade = loadTexture("blade.bmp");
-
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
