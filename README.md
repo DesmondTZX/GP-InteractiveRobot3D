@@ -1,7 +1,10 @@
-# GPAssignment
+# GP-InteractiveRobot3D
 ![image](https://github.com/DesmondTZX/GPAssignment/blob/main/screenshot.png)
 
 This project is based on "Elite Battle Robot" (https://sketchfab.com/3d-models/elite-battle-robot-02b9587184b746178c85fe9ced67ccd7) by NicolasCalaba (https://sketchfab.com/NicolasCalaba) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+# Introduction
+This project is a 3D interactive robot application developed using C++, OpenGL, FreeGLUT, and GLU. It allows users to interact with a robot model in a real-time 3D environment. This project was created as part of the BACS2173 Graphics Programming course assignment.
 
 # Setup Guide
 ## Windows
@@ -16,17 +19,17 @@ This project is based on "Elite Battle Robot" (https://sketchfab.com/3d-models/e
 4. Run the executable called “main” via the terminal or double-clicking.
 
 ## Linux
-1. Install G++ using the terminal.
+1. Install G++ and freeglut3-dev using the terminal.
 
-Ubuntu: `sudo apt install g++`
+Ubuntu: `sudo apt install g++ freeglut3-dev`
 
-Fedora: `sudo dnf install gcc-c++`
+Fedora: `sudo dnf install gcc-c++ freeglut-devel`
 
-Arch Linux: `sudo pacman -S g++`
+Arch Linux: `sudo pacman -S g++ freeglut`
 
 2. Navigate to the project folder that contains “main.cpp”.
 3. Type g++ main.cpp -o main -lGL -lGLU -lglut into the terminal.
-4. Run the executable called “main” via the terminal or double-clicking.
+4. Run the executable called “main” via the terminal (`sudo ./main`) or double-clicking.
 
 # Keymaps and Controls
 | **Keys**  | **Functions**                                                                 |
